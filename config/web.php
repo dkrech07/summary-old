@@ -45,7 +45,10 @@ $config = [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'rules' => [],
+            'rules' => [
+                '/' => '/site/login',
+                '/signup' => '/site/signup',
+            ],
         ],
     ],
     'params' => $params,
