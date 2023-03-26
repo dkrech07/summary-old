@@ -15,6 +15,23 @@ use app\models\SignupForm;
 
 class SignupController extends Controller
 {
+  // public function behaviors()
+  // {
+  //   return [
+  //     'access' => [
+  //       'class' => AccessControl::class,
+  //       'only' => ['index'],
+  //       'rules' => [
+  //         [
+  //           'allow' => true,
+  //           'actions' => ['index'],
+  //           'roles' => ['?']
+  //         ]
+  //       ]
+  //     ]
+  //   ];
+  // }
+
   public function actionIndex()
   {
     $model = new SignupForm();
@@ -22,7 +39,7 @@ class SignupController extends Controller
     if ($model->load(Yii::$app->request->post())) {
       if ($user = $model->signup()) {
         if (Yii::$app->getUser()->login($user)) {
-          return $this->goHome();
+          $this->redirect('/site');
         }
       }
     }

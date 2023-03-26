@@ -14,6 +14,24 @@ use app\models\SignupForm;
 
 class AuthController extends Controller
 {
+
+  // public function behaviors()
+  // {
+  //   return [
+  //     'access' => [
+  //       'class' => AccessControl::class,
+  //       'only' => ['index'],
+  //       'rules' => [
+  //         [
+  //           'allow' => true,
+  //           'actions' => ['index'],
+  //           'roles' => ['?']
+  //         ]
+  //       ]
+  //     ]
+  //   ];
+  // }
+
   /**
    * Displays homepage.
    *
@@ -27,7 +45,12 @@ class AuthController extends Controller
 
     $model = new LoginForm();
     if ($model->load(Yii::$app->request->post()) && $model->login()) {
-      return $this->goBack();
+
+      if ($model->validate()) {
+        $user = $model->getUser();
+        Yii::$app->user->login($user);
+        $this->redirect('/site');
+      }
     }
 
     $model->password = '';

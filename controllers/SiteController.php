@@ -12,7 +12,7 @@ use app\models\ContactForm;
 use app\models\User;
 use app\models\SignupForm;
 
-class SiteController extends Controller
+class SiteController extends SecuredController
 {
     /**
      * Displays homepage.
@@ -21,6 +21,8 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+
+        print_r(Yii::$app->getUser());
         return $this->render('index');
     }
 }

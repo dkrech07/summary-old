@@ -48,6 +48,7 @@ $config = [
             'rules' => [
                 '/' => '/auth/index',
                 '/signup' => '/signup/index',
+                '/site' => '/site/index',
             ],
         ],
     ],
