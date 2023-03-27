@@ -5,32 +5,33 @@ namespace app\controllers;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
-use yii\web\Response;
-use yii\filters\VerbFilter;
 use app\models\LoginForm;
-use app\models\ContactForm;
-use app\models\User;
-use app\models\SignupForm;
+
+// use yii\web\Response;
+// use yii\filters\VerbFilter;
+// use app\models\ContactForm;
+// use app\models\User;
+// use app\models\SignupForm;
 
 class AuthController extends Controller
 {
 
-  // public function behaviors()
-  // {
-  //   return [
-  //     'access' => [
-  //       'class' => AccessControl::class,
-  //       'only' => ['index'],
-  //       'rules' => [
-  //         [
-  //           'allow' => true,
-  //           'actions' => ['index'],
-  //           'roles' => ['?']
-  //         ]
-  //       ]
-  //     ]
-  //   ];
-  // }
+  public function behaviors()
+  {
+    return [
+      'access' => [
+        'class' => AccessControl::class,
+        'only' => ['index'],
+        'rules' => [
+          [
+            'allow' => true,
+            'actions' => ['index'],
+            'roles' => ['?']
+          ]
+        ]
+      ]
+    ];
+  }
 
   /**
    * Displays homepage.
@@ -57,5 +58,14 @@ class AuthController extends Controller
     return $this->render('index', [
       'model' => $model,
     ]);
+  }
+
+  public function beforeAction($action)
+  {
+    if (!Yii::$app->user->isGuest) {
+      $this->redirect('/site/index');
+      return false;
+    }
+    return true;
   }
 }

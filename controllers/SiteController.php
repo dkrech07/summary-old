@@ -21,8 +21,18 @@ class SiteController extends SecuredController
      */
     public function actionIndex()
     {
+        $user = Yii::$app->user->identity;
+        return $this->render(
+            'index',
+            [
+                'user' => $user,
+            ]
+        );
+    }
 
-        print_r(Yii::$app->getUser());
-        return $this->render('index');
+    public function actionLogout()
+    {
+        \Yii::$app->user->logout();
+        return $this->goHome();
     }
 }

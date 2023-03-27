@@ -5,8 +5,25 @@
 $this->title = 'My Yii Application';
 ?>
 <div class="site-index">
+    <?php
+    print('username:');
+    print('<br>');
+    print($user->username);
+    print('<br>');
+    print('email:');
+    print('<br>');
+    print($user->email);
+    print('<br>');
+    print('<br>');
+    // print('<br>');
+    // print('user status:');
+    // print('<br>');
+    // print(Yii::$app->user->isGuest);
+    ?>
 
-    <div class="jumbotron text-center bg-transparent">
+    <h1 style="color:red">ВИТЕК!!! <br>ПИШИ ТЗ!!!!!</h1>
+
+    <!-- <div class="jumbotron text-center bg-transparent">
         <h1 class="display-4">Congratulations!</h1>
 
         <p class="lead">You have successfully created your Yii-powered application.</p>
@@ -50,4 +67,4 @@ $this->title = 'My Yii Application';
         </div>
 
     </div>
-</div>
+</div> -->
