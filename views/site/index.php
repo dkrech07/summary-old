@@ -21,7 +21,7 @@ $this->title = 'My Yii Application';
     // print(Yii::$app->user->isGuest);
     ?>
 
-    <h1 style="color:red">ВИТЕК!!! <br>ПИШИ ТЗ!!!!!</h1>
+
 
     <!-- <div class="jumbotron text-center bg-transparent">
         <h1 class="display-4">Congratulations!</h1>

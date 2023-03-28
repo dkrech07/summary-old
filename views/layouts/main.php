@@ -32,43 +32,54 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     <?php $this->beginBody() ?>
 
     <header id="header">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container">
+                <a class="navbar-brand" href="#">Панель навигации</a>
+                <!-- <img src="/img/logo.png" width="40" height="40" alt=""> -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Переключатель навигации">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">Главная</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Ссылка</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Отключенная</a>
+                        </li>
+                    </ul>
+                    <form class="d-flex">
+                        <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Поиск">
+                        <button class="btn btn-outline-success" type="submit">Поиск</button>
+                    </form>
+                </div>
+            </div>
+        </nav>
         <?php
-        NavBar::begin([
-            'brandLabel' => 'My Company',
-            'brandUrl' => Yii::$app->homeUrl,
-            'options' => [
-                'class' => 'navbar-inverse navbar-fixed-top',
-            ],
-        ]);
+        // NavBar::begin([
+        //     'brandLabel' => 'My Company',
+        //     'brandUrl' => Yii::$app->homeUrl,
+        //     'options' => [
+        //         'class' => 'navbar-inverse navbar-fixed-top',
+        //     ],
+        // ]);
 
-        // $menuItems = [
-        //     ['label' => 'Home', 'url' => ['/site/index']],
-        //     ['label' => 'About', 'url' => ['/site/about']],
-        //     ['label' => 'Contact', 'url' => ['/site/contact']],
-        // ];
+        // if (Yii::$app->user->isGuest) {
+        //     $menuItems[] = ['label' => 'Авторизация', 'url' => ['/auth/index']];
+        //     $menuItems[] = ['label' => 'Регистрация', 'url' => ['/signup/index']];
+        // } else {
+        //     $menuItems[] = ['label' => 'Выход', 'url' => ['/site/logout']];
+        // }
 
-        if (Yii::$app->user->isGuest) {
-            $menuItems[] = ['label' => 'Авторизация', 'url' => ['/auth/index']];
-            $menuItems[] = ['label' => 'Регистрация', 'url' => ['/signup/index']];
-        } else {
-            $menuItems[] = ['label' => 'Выход', 'url' => ['/site/logout']];
+        // echo Nav::widget([
+        //     'options' => ['class' => 'navbar-nav navbar-right'],
+        //     'items' => $menuItems,
+        // ]);
 
-            // $menuItems[] = '<li>'
-            //     . Html::beginForm(['/site/logout'], 'post')
-            //     . Html::submitButton(
-            //         'Logout (' . Yii::$app->user->identity->username . ')',
-            //         ['class' => 'btn btn-link logout']
-            //     )
-            //     . Html::endForm()
-            //     . '</li>';
-        }
-
-        echo Nav::widget([
-            'options' => ['class' => 'navbar-nav navbar-right'],
-            'items' => $menuItems,
-        ]);
-
-        NavBar::end();
+        // NavBar::end();
         ?>
     </header>
 
