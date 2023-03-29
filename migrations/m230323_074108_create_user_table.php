@@ -18,7 +18,7 @@ class m230323_074108_create_user_table extends Migration
             $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
         }
 
-        $this->createTable('user', [
+        $this->createTable('{{%user}}', [
             'id' => $this->primaryKey(),
             'username' => $this->string()->notNull()->unique(),
             'auth_key' => $this->string(32)->notNull(),
@@ -26,9 +26,44 @@ class m230323_074108_create_user_table extends Migration
             'password_reset_token' => $this->string()->unique(),
             'email' => $this->string()->notNull()->unique(),
             'status' => $this->smallInteger()->notNull()->defaultValue(10),
+            'updated_at' => $this->integer()->notNull(),
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
         ], $tableOptions);
+
+        $this->createTable('status', [
+            'id' => $this->primaryKey(),
+            'status_title' => $this->string(256)->notNull(),
+        ]);
+
+        $this->createTable('{{%summary}}', [
+            'id' => $this->primaryKey(),
+            'status' => $this->integer()->notNull(),
+            'title' => $this->string(256)->notNull(),
+            'detail' => $this->text(),
+            'summary' => $this->text(),
+            'created_user' => $this->integer()->notNull(),
+            'created_at' => $this->dateTime()->notNull(),
+            'updated_at' => $this->dateTime()->notNull(),
+        ]);
+
+        $this->addForeignKey(
+            'status',
+            'summary',
+            'status',
+            'user',
+            'id',
+            'CASCADE'
+        );
+
+        $this->addForeignKey(
+            'created_user',
+            'summary',
+            'created_user',
+            'status',
+            'id',
+            'CASCADE'
+        );
     }
 
     /**
@@ -37,5 +72,7 @@ class m230323_074108_create_user_table extends Migration
     public function safeDown()
     {
         $this->dropTable('user');
+        $this->dropTable('summary');
+        $this->dropTable('status');
     }
 }

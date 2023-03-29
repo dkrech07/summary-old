@@ -34,53 +34,22 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     <header id="header">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container">
-                <a class="navbar-brand" href="#">Панель навигации</a>
-                <!-- <img src="/img/logo.png" width="40" height="40" alt=""> -->
+                <a class="navbar-brand" href="/">Summary</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Переключатель навигации">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+                <div class="collapse navbar-collapse" id="navbarToggler">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#">Главная</a>
+                            <a class="nav-link active" aria-current="page" href="/auth/index">Авторизация</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Ссылка</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Отключенная</a>
+                            <a class="nav-link active" aria-current="page" href="/signup/index">Регистрация</a>
                         </li>
                     </ul>
-                    <form class="d-flex">
-                        <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Поиск">
-                        <button class="btn btn-outline-success" type="submit">Поиск</button>
-                    </form>
                 </div>
             </div>
         </nav>
-        <?php
-        // NavBar::begin([
-        //     'brandLabel' => 'My Company',
-        //     'brandUrl' => Yii::$app->homeUrl,
-        //     'options' => [
-        //         'class' => 'navbar-inverse navbar-fixed-top',
-        //     ],
-        // ]);
-
-        // if (Yii::$app->user->isGuest) {
-        //     $menuItems[] = ['label' => 'Авторизация', 'url' => ['/auth/index']];
-        //     $menuItems[] = ['label' => 'Регистрация', 'url' => ['/signup/index']];
-        // } else {
-        //     $menuItems[] = ['label' => 'Выход', 'url' => ['/site/logout']];
-        // }
-
-        // echo Nav::widget([
-        //     'options' => ['class' => 'navbar-nav navbar-right'],
-        //     'items' => $menuItems,
-        // ]);
-
-        // NavBar::end();
-        ?>
     </header>
 
     <main id="main" class="flex-shrink-0" role="main">
@@ -96,7 +65,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     <footer id="footer" class="mt-auto py-3 bg-light">
         <div class="container">
             <div class="row text-muted">
-                <div class="col-md-6 text-center text-md-start">&copy; My Company <?= date('Y') ?></div>
+                <div class="col-md-6 text-center text-md-start">&copy; Summary <?= date('Y') ?></div>
                 <div class="col-md-6 text-center text-md-end"><?= Yii::powered() ?></div>
             </div>
         </div>

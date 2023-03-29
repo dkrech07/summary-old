@@ -27,8 +27,10 @@ yii migrate
 
 7. Загрузить тестовые данные:
 
-yii fixture "fixture 1, fixture 2, fixture 3, ..."
+yii fixture "Status, Summary,"
 
+php yii fixture/load Status
+php yii fixture/load Summary
 
 Дополнительно:
 

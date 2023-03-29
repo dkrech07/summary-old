@@ -14,6 +14,8 @@ use app\models\SignupForm;
 
 class SiteController extends SecuredController
 {
+    public $layout = 'summary';
+
     /**
      * Displays homepage.
      *
