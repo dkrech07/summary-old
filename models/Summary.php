@@ -8,15 +8,16 @@ use Yii;
  * This is the model class for table "summary".
  *
  * @property int $id
- * @property string $number
- * @property int $status
+ * @property int $summary_status
  * @property string $title
  * @property string|null $detail
  * @property string|null $summary
+ * @property int $created_user
  * @property string $created_at
  * @property string $updated_at
  *
- * @property Status $status0
+ * @property User $createdUser
+ * @property Status $summaryStatus
  */
 class Summary extends \yii\db\ActiveRecord
 {
@@ -34,11 +35,13 @@ class Summary extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['number', 'status', 'title', 'created_at', 'updated_at'], 'required'],
-            [['status'], 'integer'],
+            [['summary_status', 'title', 'created_user', 'created_at', 'updated_at'], 'required'],
+            [['summary_status', 'created_user'], 'integer'],
+            [['detail', 'summary'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
-            [['number', 'title', 'detail', 'summary'], 'string', 'max' => 256],
-            [['status'], 'exist', 'skipOnError' => true, 'targetClass' => Status::class, 'targetAttribute' => ['status' => 'id']],
+            [['title'], 'string', 'max' => 256],
+            [['created_user'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['created_user' => 'id']],
+            [['summary_status'], 'exist', 'skipOnError' => true, 'targetClass' => Status::class, 'targetAttribute' => ['summary_status' => 'id']],
         ];
     }
 
@@ -49,23 +52,33 @@ class Summary extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'number' => 'Number',
-            'status' => 'Status',
+            'summary_status' => 'Summary Status',
             'title' => 'Title',
             'detail' => 'Detail',
             'summary' => 'Summary',
+            'created_user' => 'Created User',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
     }
 
     /**
-     * Gets query for [[Status0]].
+     * Gets query for [[CreatedUser]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getStatus0()
+    public function getCreatedUser()
     {
-        return $this->hasOne(Status::class, ['id' => 'status']);
+        return $this->hasOne(User::class, ['id' => 'created_user']);
+    }
+
+    /**
+     * Gets query for [[SummaryStatus]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSummaryStatus()
+    {
+        return $this->hasOne(Status::class, ['id' => 'summary_status']);
     }
 }

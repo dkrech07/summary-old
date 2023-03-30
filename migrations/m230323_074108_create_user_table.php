@@ -38,7 +38,7 @@ class m230323_074108_create_user_table extends Migration
 
         $this->createTable('{{%summary}}', [
             'id' => $this->primaryKey(),
-            'status' => $this->integer()->notNull(),
+            'summary_status' => $this->integer()->notNull(),
             'title' => $this->string(256)->notNull(),
             'detail' => $this->text(),
             'summary' => $this->text(),
@@ -48,10 +48,10 @@ class m230323_074108_create_user_table extends Migration
         ]);
 
         $this->addForeignKey(
-            'status',
+            'summary_status',
             'summary',
+            'summary_status',
             'status',
-            'user',
             'id',
             'CASCADE'
         );
@@ -60,7 +60,7 @@ class m230323_074108_create_user_table extends Migration
             'created_user',
             'summary',
             'created_user',
-            'status',
+            'user',
             'id',
             'CASCADE'
         );

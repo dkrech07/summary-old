@@ -1,5 +1,8 @@
 <?php
 
+use yii\widgets\LinkPager;
+use yii\helpers\Html;
+
 /** @var yii\web\View $this */
 
 $this->title = 'My Yii Application';
@@ -15,11 +18,36 @@ $this->title = 'My Yii Application';
     print($user->email);
     print('<br>');
     print('<br>');
+    // print_r($summaryItems);
     // print('<br>');
     // print('user status:');
     // print('<br>');
     // print(Yii::$app->user->isGuest);
+
+    // foreach ($summaryItems as $item) {
+    //     print_r($item->summaryStatus->status_title);
+    //     print('<br>');
+    //     print('<br>');
+    // }
     ?>
+
+    <!-- <nav aria-label="...">
+        <ul class="pagination">
+            <li class="page-item disabled">
+                <span class="page-link">Предыдущая</span>
+            </li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">2</span>
+            </li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">Следующая</a>
+            </li>
+        </ul>
+    </nav> -->
+
+
     <table class="summary-table table table-hover">
         <thead>
             <tr>
@@ -31,7 +59,17 @@ $this->title = 'My Yii Application';
             </tr>
         </thead>
         <tbody>
-            <tr id='1'>
+            <?php foreach ($models as $model) : ?>
+                <tr class="summary-item" id='<?= Html::encode($model->id); ?>'>
+                    <th scope="row"></th>
+                    <td class="status" data-status="<?= Html::encode($model->summary_status); ?>"><?= Html::encode($model->summaryStatus->status_title); ?></td>
+                    <td><?= Html::encode($model->title); ?></td>
+                    <td class="detail"><i class="bi bi-pencil-square"></i></td>
+                    <td class="summary"><i class="bi bi-pencil-square"></i></td>
+                </tr>
+            <?php endforeach; ?>
+
+            <!-- <tr id='1'>
                 <th scope="row">1</th>
                 <td class="text-danger">Конвертация речи в текст</td>
                 <td>Летучка 12.08.2023</td>
@@ -58,9 +96,15 @@ $this->title = 'My Yii Application';
                 <td>Выдержка из обещаний верстальщика сделать все задачи</td>
                 <td class="detail"><i class="bi bi-pencil-square"></i></td>
                 <td class="summary"><i class="bi bi-pencil-square"></i></td>
-            </tr>
+            </tr> -->
         </tbody>
     </table>
+
+    <?=
+    LinkPager::widget([
+        'pagination' => $pages,
+    ]);
+    ?>
 
     <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">Открыть модальное окно для @mdo</button> -->
     <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@fat">Открыть модальное окно для @fat</button>

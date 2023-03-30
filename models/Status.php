@@ -51,6 +51,6 @@ class Status extends \yii\db\ActiveRecord
      */
     public function getSummaries()
     {
-        return $this->hasMany(Summary::class, ['status' => 'id']);
+        return $this->hasMany(Summary::class, ['summary_status' => 'id']);
     }
 }
