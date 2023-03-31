@@ -79,7 +79,7 @@ $this->title = 'My Yii Application';
     ?>
 </div>
 
-<?= ModalForm::widget(['formType' => 'DetailForm', 'formModel' => $detailModel]) ?>
+<?= ModalForm::widget(['formType' => 'DetailForm', 'formModel' => $detailFormModel]) ?>
 
 
 <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">Открыть модальное окно для @mdo</button> -->

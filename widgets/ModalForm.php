@@ -6,13 +6,13 @@ use yii\base\Widget;
 
 class ModalForm extends Widget
 {
-  public $model;
-  public $type;
+  public $formModel;
+  public $formType;
 
   public function run()
   {
-    return $this->render("{$this->type}", [
-      'model' => $this->model,
+    return $this->render("{$this->formType}", [
+      'formModel' => $this->formModel
     ]);
   }
 }

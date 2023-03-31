@@ -24,6 +24,15 @@ use Yii;
  */
 class DetailForm extends Model
 {
+  public $number;
+  public $summary_status;
+  public $title;
+  public $detail;
+  public $summary;
+  public $created_user;
+  public $created_at;
+  public $updated_at;
+
   /**
    * {@inheritdoc}
    */
