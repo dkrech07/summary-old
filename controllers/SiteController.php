@@ -15,6 +15,8 @@ use app\services\SummaryService;
 use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
 
+use app\models\DetailForm;
+
 class SiteController extends SecuredController
 {
     public $layout = 'summary';
@@ -28,6 +30,7 @@ class SiteController extends SecuredController
     {
         $user = Yii::$app->user->identity;
         $summaryService = new SummaryService;
+        $detailFormModel = new DetailForm();
 
         $query = $summaryService->getSummaryItems();
         $countQuery = clone $query;
@@ -36,7 +39,17 @@ class SiteController extends SecuredController
             ->limit(15)
             ->all();
 
-        // print($countQuery->count());
+        // if (Yii::$app->request->post('CustomEditForm')) {
+        //     $customEditFormModel->load(Yii::$app->request->post());
+        //     if (Yii::$app->request->isAjax) {
+        //         Yii::$app->response->format = Response::FORMAT_JSON;
+        //         return ActiveForm::validate($customEditFormModel);
+        //     }
+        //     if ($customEditFormModel->validate()) {
+        //         (new GrandmasterService())->editCustom($customEditFormModel);
+        //         return $this->refresh();
+        //     }
+        // }
 
         return $this->render(
             'index',
@@ -44,6 +57,7 @@ class SiteController extends SecuredController
                 'user' => $user,
                 'models' => $models,
                 'pages' => $pages,
+                'detailFormModel' => $detailFormModel,
             ]
         );
     }

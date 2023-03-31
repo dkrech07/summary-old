@@ -2,6 +2,7 @@
 
 use yii\widgets\LinkPager;
 use yii\helpers\Html;
+use app\widgets\ModalForm;
 
 /** @var yii\web\View $this */
 
@@ -37,8 +38,8 @@ $this->title = 'My Yii Application';
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">Статус</th>
                 <th scope="col">Название записи</th>
+                <th scope="col">Статус</th>
                 <th scope="col">Подробное описание</th>
                 <th scope="col">Краткое резюме</th>
             </tr>
@@ -47,10 +48,10 @@ $this->title = 'My Yii Application';
             <?php foreach ($models as $key => $model) : ?>
                 <tr class="summary-item" id='<?= Html::encode($model->id); ?>'>
                     <td scope="row"><?= Html::encode($model->number); ?></td>
-                    <td class="status" data-status="<?= Html::encode($model->summary_status); ?>"><?= Html::encode($model->summaryStatus->status_title); ?></td>
                     <td><?= Html::encode($model->title); ?></td>
-                    <td class="detail"><i class="bi bi-pencil-square"></i></td>
-                    <td class="summary"><i class="bi bi-pencil-square"></i></td>
+                    <td class="status" data-status="<?= Html::encode($model->summary_status); ?>"><?= Html::encode($model->summaryStatus->status_title); ?></td>
+                    <td class="detail-edit"><i class="bi bi-pencil-square"></i></td>
+                    <td class="summary-edit"><i class="bi bi-pencil-square"></i></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
@@ -59,7 +60,7 @@ $this->title = 'My Yii Application';
 
 <?php if (!count($models)) : ?>
     <div class="row">
-        <p class="empty-message">Создайте свою первую запись.</p>
+        <p>Создайте свою первую запись.</p>
     </div>
 <?php endif; ?>
 
@@ -78,11 +79,14 @@ $this->title = 'My Yii Application';
     ?>
 </div>
 
+<?= ModalForm::widget(['formType' => 'DetailForm', 'formModel' => $detailModel]) ?>
+
+
 <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">Открыть модальное окно для @mdo</button> -->
 <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@fat">Открыть модальное окно для @fat</button>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@getbootstrap">Открыть модальное окно для @getbootstrap</button> -->
 
-<div class="modal fade" id="summaryModal" tabindex="-1" aria-labelledby="summaryModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="summaryModal" tabindex="-1" aria-labelledby="summaryModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -107,7 +111,7 @@ $this->title = 'My Yii Application';
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <!-- <div class="jumbotron text-center bg-transparent">
         <h1 class="display-4">Congratulations!</h1>

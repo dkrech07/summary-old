@@ -1,64 +1,57 @@
+var addSummaryElement = document.querySelector('.add-summary');
 var summaryTableElement = document.querySelector('.summary-table');
 
 // Подстветка статусов на элементах списка
-
 var summaryElement = summaryTableElement.querySelectorAll('.summary-item');
-
 summaryElement.forEach(element => {
   statusElement = element.querySelector('.status');
   console.log(statusElement);
   console.log(statusElement.dataset.status);
-
   if (statusElement.dataset.status == 3) {
     statusElement.style.color = 'green';
   }
   if (statusElement.dataset.status == 4) {
     statusElement.style.color = 'red';
   }
-  // if (statusElement.dataset.status == 2) {
-  //   statusElement.style.color = 'orange';
-  // }
-  // if (statusElement.dataset.status == 3) {
-  //   statusElement.style.color = 'green';
-  // }
-  // if (statusElement.dataset.status == 4) {
-  //   statusElement.style.color = 'red';
-  // }
 });
-// var detailElement = summaryTableElement.querySelectorAll('.detail');
-// var summaryElement = summaryTableElement.querySelectorAll('.summary');
 
+// Создание записи
 
-
-// detailElement.forEach(element => {
-//   element.addEventListener('click', evt => {
-//     openModal(element);
-//   });
+// addSummaryElement.addEventListener('click', evt => {
+//   evt.preventDefault();
+//   openModal(1);
 // });
 
+// Редактирование подробного и краткого описания
+var detailEditElement = summaryTableElement.querySelectorAll('.detail-edit');
+var summaryEditElement = summaryTableElement.querySelectorAll('.summary-edit');
 
-// summaryElement.forEach(element => {
-//   element.addEventListener('click', evt => {
-//     openModal(element);
-//   });
-// });
-
-// var openModal = (element) => {
-//   console.log(element);
-//   if (element.className === 'detail') {
-//     $('#summaryModal.modal-title').textContent = 'Подробное описание';
+detailEditElement.forEach(element => {
+  element.addEventListener('click', evt => {
+    openModal(element);
+  });
+});
 
 
-//   }
+summaryEditElement.forEach(element => {
+  element.addEventListener('click', evt => {
+    openModal(element);
+  });
+});
 
-//   if (element.className === 'summary') {
+var openModal = (element) => {
+  console.log(element);
+  if (element.className === 'detail') {
+    $('#summaryModal.modal-title').textContent = 'Подробное описание';
+  }
+  if (element.className === 'summary') {
+  }
+  $('#summaryModal').modal('show');
+  // var modalElement = document.querySelector('#summaryModal');
+  // modalElement.show();
+};
 
-//   }
-//   $('#summaryModal').modal('show');
 
-//   // var modalElement = document.querySelector('#summaryModal');
-//   // modalElement.show();
-// };
 
 // // получим кнопку id="btn" с помощью которой будем открывать модальное окно
 // const btn = document.querySelector('#btn');
