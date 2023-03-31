@@ -1,9 +1,18 @@
-.page-control span {
+.summary-main .summary-container {
+  padding-top: 20px;
+  font-size: 12px;
+}
+
+.summary-main .summary-container .pagination .page-item a,
+.summary-main .summary-container .pagination .page-item span {
+  font-size: 12px;
+}
+
+.page-item span {
   position: relative;
   display: block;
   padding: var(--bs-pagination-padding-y) var(--bs-pagination-padding-x);
   font-size: var(--bs-pagination-font-size);
-  /* color: var(--bs-pagination-color); */
   color: var(--bs-pagination-disabled-color);
   text-decoration: none;
   background-color: var(--bs-pagination-bg);
@@ -11,12 +20,16 @@
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.page-control:first-child span {
+.page-item:first-child span {
   border-top-left-radius: var(--bs-pagination-border-radius);
   border-bottom-left-radius: var(--bs-pagination-border-radius);
 }
 
-.page-control:last-child span {
+.page-item:last-child span {
   border-top-right-radius: var(--bs-pagination-border-radius);
   border-bottom-right-radius: var(--bs-pagination-border-radius);
+}
+
+.empty-message {
+  /* color: red; */
 }

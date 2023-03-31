@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "summary".
  *
  * @property int $id
+ * @property int $number
  * @property int $summary_status
  * @property string $title
  * @property string|null $detail
@@ -35,8 +36,8 @@ class Summary extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['summary_status', 'title', 'created_user', 'created_at', 'updated_at'], 'required'],
-            [['summary_status', 'created_user'], 'integer'],
+            [['number', 'summary_status', 'title', 'created_user', 'created_at', 'updated_at'], 'required'],
+            [['number', 'summary_status', 'created_user'], 'integer'],
             [['detail', 'summary'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
             [['title'], 'string', 'max' => 256],
@@ -52,6 +53,7 @@ class Summary extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'number' => 'Number',
             'summary_status' => 'Summary Status',
             'title' => 'Title',
             'detail' => 'Detail',

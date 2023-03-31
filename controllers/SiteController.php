@@ -33,22 +33,10 @@ class SiteController extends SecuredController
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count()]);
         $models = $query->offset($pages->offset)
-            ->limit($pages->limit)
+            ->limit(15)
             ->all();
 
-        // $summaryItems = $query->all();
-
-        // $dataProvider = new ActiveDataProvider([
-        //     'query' => $query,
-        //     'pagination' => [
-        //         'pageSize' => 5,
-        //     ],
-        //     'sort' => [
-        //         'defaultOrder' => [
-        //             'created_at' => SORT_DESC,
-        //         ]
-        //     ],
-        // ]);
+        // print($countQuery->count());
 
         return $this->render(
             'index',
@@ -56,8 +44,6 @@ class SiteController extends SecuredController
                 'user' => $user,
                 'models' => $models,
                 'pages' => $pages,
-                // 'dataProvider' => $dataProvider,
-                // 'summaryItems' => $summaryItems,
             ]
         );
     }

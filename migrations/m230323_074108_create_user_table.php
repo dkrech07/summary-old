@@ -38,6 +38,7 @@ class m230323_074108_create_user_table extends Migration
 
         $this->createTable('{{%summary}}', [
             'id' => $this->primaryKey(),
+            'number' => $this->integer()->notNull(),
             'summary_status' => $this->integer()->notNull(),
             'title' => $this->string(256)->notNull(),
             'detail' => $this->text(),
