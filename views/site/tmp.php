@@ -55,3 +55,13 @@ use TaskForce\utils\NounPluralConverter;
     ],
   ],
 ]); ?>
+
+
+<?= $form->field($formModel, 'number')->textInput(['readonly' => true]) ?>
+<?= $form->field($formModel, 'summary_status')->textInput() ?>
+<?= $form->field($formModel, 'title')->textInput() ?>
+<?= $form->field($formModel, 'detail')->textInput() ?>
+<?= $form->field($formModel, 'summary')->textInput() ?>
+<?= $form->field($formModel, 'created_user')->textInput() ?>
+<?= $form->field($formModel, 'created_at')->textInput() ?>
+<?= $form->field($formModel, 'updated_at')->textInput() ?>

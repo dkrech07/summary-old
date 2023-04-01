@@ -39,6 +39,17 @@ class SiteController extends SecuredController
             ->limit(15)
             ->all();
 
+        if (\Yii::$app->request->isAjax && \Yii::$app->request->post()) {
+            $request = Yii::$app->request;
+            $data = $request->post();
+
+            if (key($data) == 'item_id') {
+                // return json_encode('test', JSON_UNESCAPED_UNICODE);
+
+                return json_encode((new SummaryService())->getEditSummaryItem($data['item_id']), JSON_UNESCAPED_UNICODE);
+            }
+        }
+
         // if (Yii::$app->request->post('CustomEditForm')) {
         //     $customEditFormModel->load(Yii::$app->request->post());
         //     if (Yii::$app->request->isAjax) {

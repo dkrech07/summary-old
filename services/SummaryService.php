@@ -55,9 +55,33 @@ class SummaryService
   //     ->one();
   // }
 
+  public function getEditSummaryItem($data)
+  {
+    $detailFormModel = new DetailForm();
+
+    $editSummaryItem = Summary::find()
+      ->where(['ID' => $data])
+      ->one();
+
+    $detailFormModel->number = $editSummaryItem->number;
+    $detailFormModel->summary_status = $editSummaryItem->summary_status;
+    $detailFormModel->title = $editSummaryItem->title;
+    $detailFormModel->detail = $editSummaryItem->detail;
+    $detailFormModel->summary = $editSummaryItem->summary;
+    $detailFormModel->created_user = $editSummaryItem->created_user;
+    $detailFormModel->created_at = $editSummaryItem->created_at;
+    $detailFormModel->updated_at = $editSummaryItem->updated_at;
+
+    return $detailFormModel;
+  }
+
 
   public function DetailEdit(DetailForm $detailModel)
   {
+
+    $editSummaryItem = Summary::find()
+      ->where(['id' => $detailModel->id])
+      ->one();
     //   $editCustom = Customs::find()
     //     ->where(['ID' => $customEditFormModel->ID])
     //     ->one();

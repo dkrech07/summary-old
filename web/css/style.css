@@ -29,3 +29,7 @@
   border-top-right-radius: var(--bs-pagination-border-radius);
   border-bottom-right-radius: var(--bs-pagination-border-radius);
 }
+
+#detailform-detail {
+  height: auto;
+}

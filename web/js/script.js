@@ -5,8 +5,6 @@ var summaryTableElement = document.querySelector('.summary-table');
 var summaryElement = summaryTableElement.querySelectorAll('.summary-item');
 summaryElement.forEach(element => {
   statusElement = element.querySelector('.status');
-  console.log(statusElement);
-  console.log(statusElement.dataset.status);
   if (statusElement.dataset.status == 3) {
     statusElement.style.color = 'green';
   }
@@ -28,7 +26,41 @@ var summaryEditElement = summaryTableElement.querySelectorAll('.summary-edit');
 
 detailEditElement.forEach(element => {
   element.addEventListener('click', evt => {
-    openModal(element);
+
+    var data = {
+      'item_id': element.parentNode.id
+    };
+
+    $.ajax({
+      url: '/site/index',
+      type: 'POST',
+      data: data,
+      success: function (response) {
+        var detailData = JSON.parse(response);
+        var detailModalElement = document.querySelector('#detailModal');
+        var detailModalInput = detailModalElement.querySelector('#detailform-detail');
+        console.log(detailModalInput);
+        detailModalInput.value = detailData['detail'];
+        if (detailData) {
+          $('#detailModal').modal('show');
+        }
+        // customEditForm.querySelector('#customeditform-id').value = detailEdit['ID'];
+        // detailEdit.querySelector('#detailform-detail').value = 'test';
+        // customEditForm.querySelector('#customeditform-namt').value = customEdit['NAMT'];
+        // customEditForm.querySelector('#customeditform-okpo').value = customEdit['OKPO'];
+        // customEditForm.querySelector('#customeditform-ogrn').value = customEdit['OGRN'];
+        // customEditForm.querySelector('#customeditform-inn').value = customEdit['INN'];
+        // customEditForm.querySelector('#customeditform-name_all').value = customEdit['NAME_ALL'];
+        // customEditForm.querySelector('#customeditform-adrtam').value = customEdit['ADRTAM'];
+        // customEditForm.querySelector('#customeditform-prosf').value = customEdit['PROSF'];
+        // customEditForm.querySelector('#customeditform-telefon').value = customEdit['TELEFON'];
+        // customEditForm.querySelector('#customeditform-fax').value = customEdit['FAX'];
+        // customEditForm.querySelector('#customeditform-email').value = customEdit['EMAIL'];
+        // customEditForm.querySelector('#customeditform-coords_latitude').value = customEdit['COORDS_LATITUDE'];
+        // customEditForm.querySelector('#customeditform-coords_longitude').value = customEdit['COORDS_LONGITUDE'];
+      }
+    });
+
   });
 });
 
@@ -39,17 +71,16 @@ summaryEditElement.forEach(element => {
   });
 });
 
-var openModal = (element) => {
-  console.log(element);
-  if (element.className === 'detail') {
-    $('#summaryModal.modal-title').textContent = 'Подробное описание';
-  }
-  if (element.className === 'summary') {
-  }
-  $('#summaryModal').modal('show');
-  // var modalElement = document.querySelector('#summaryModal');
-  // modalElement.show();
-};
+// var openModal = (element) => {
+//   if (element.className === 'detail') {
+//     $('#summaryModal.modal-title').textContent = 'Подробное описание';
+//   }
+//   if (element.className === 'summary') {
+//   }
+//   $('#summaryModal').modal('show');
+//   // var modalElement = document.querySelector('#summaryModal');
+//   // modalElement.show();
+// };
 
 
 
