@@ -43,3 +43,6 @@ tests/_support/_generated
 
 #vscode
 .vscode/
+
+#upload
+/upload/

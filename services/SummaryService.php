@@ -3,7 +3,7 @@
 namespace app\services;
 
 use app\models\Summary;
-use app\models\DetailForm;
+use app\models\ItemForm;
 
 // use Yii;
 // use app\models\Replies;
@@ -57,7 +57,7 @@ class SummaryService
 
   public function getEditSummaryItem($data)
   {
-    $detailFormModel = new DetailForm();
+    $detailFormModel = new ItemForm();
 
     $editSummaryItem = Summary::find()
       ->where(['ID' => $data])
@@ -76,7 +76,7 @@ class SummaryService
   }
 
 
-  public function DetailEdit(DetailForm $detailModel)
+  public function DetailEdit(ItemForm $detailModel)
   {
 
     $editSummaryItem = Summary::find()

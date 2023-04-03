@@ -15,7 +15,7 @@ use app\services\SummaryService;
 use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
 
-use app\models\DetailForm;
+use app\models\ItemForm;
 
 class SiteController extends SecuredController
 {
@@ -30,7 +30,7 @@ class SiteController extends SecuredController
     {
         $user = Yii::$app->user->identity;
         $summaryService = new SummaryService;
-        $detailFormModel = new DetailForm();
+        $itemFormModel = new ItemForm();
 
         $query = $summaryService->getSummaryItems();
         $countQuery = clone $query;
@@ -38,15 +38,18 @@ class SiteController extends SecuredController
         $models = $query->offset($pages->offset)
             ->limit(15)
             ->all();
+        $data = null;
 
         if (\Yii::$app->request->isAjax && \Yii::$app->request->post()) {
             $request = Yii::$app->request;
             $data = $request->post();
 
-            if (key($data) == 'item_id') {
-                // return json_encode('test', JSON_UNESCAPED_UNICODE);
+            if (key($data) == 'item_id_detail') {
+                return json_encode((new SummaryService())->getEditSummaryItem($data['item_id_detail']), JSON_UNESCAPED_UNICODE);
+            }
 
-                return json_encode((new SummaryService())->getEditSummaryItem($data['item_id']), JSON_UNESCAPED_UNICODE);
+            if (key($data) == 'item_id_summary') {
+                return json_encode((new SummaryService())->getEditSummaryItem($data['item_id_summary']), JSON_UNESCAPED_UNICODE);
             }
         }
 
@@ -68,7 +71,8 @@ class SiteController extends SecuredController
                 'user' => $user,
                 'models' => $models,
                 'pages' => $pages,
-                'detailFormModel' => $detailFormModel,
+                'data' => $data,
+                'itemFormModel' => $itemFormModel,
             ]
         );
     }
@@ -77,5 +81,35 @@ class SiteController extends SecuredController
     {
         \Yii::$app->user->logout();
         return $this->goHome();
+    }
+
+    // public function actionUpload()
+    // {
+    //     $file = \yii\web\UploadedFile::getInstanceByName('file');
+    //     print($file);
+    //     // $file->saveAs($_SERVER['DOCUMENT_ROOT'] . '/web/upload' . $file->baseName . '.' . $file->extension);
+    //     // return true;
+    // }
+
+    public function actionUpload()
+    {
+        $fileName = 'upFile';
+        $uploadPath = '/web/site/upload';
+
+        print($_FILES[$fileName]);
+
+        if (isset($_FILES[$fileName])) {
+            $file = \yii\web\UploadedFile::getInstanceByName($fileName);
+
+            //Print file data
+
+            if ($file->saveAs($uploadPath . '/' . $file->name)) {
+                //Now save file data to database
+
+                echo \yii\helpers\Json::encode($file);
+            }
+        }
+
+        return false;
     }
 }

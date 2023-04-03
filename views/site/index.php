@@ -27,8 +27,8 @@ $this->title = 'My Yii Application';
                     <td scope="row"><?= Html::encode($model->number); ?></td>
                     <td><?= Html::encode($model->title); ?></td>
                     <td class="status" data-status="<?= Html::encode($model->summary_status); ?>"><?= Html::encode($model->summaryStatus->status_title); ?></td>
-                    <td class="detail-edit"><i class="bi bi-pencil-square"></i></td>
-                    <td class="summary-edit"><i class="bi bi-pencil-square"></i></td>
+                    <td class="item-edit detail"><i class="bi bi-pencil-square"></i></td>
+                    <td class="item-edit summary"><i class="bi bi-pencil-square"></i></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
@@ -56,4 +56,7 @@ $this->title = 'My Yii Application';
     ?>
 </div>
 
-<?= ModalForm::widget(['formType' => 'DetailForm', 'formModel' => $detailFormModel]) ?>
+<?= ModalForm::widget(['formType' => 'DetailForm', 'formModel' => $itemFormModel]) ?>
+<?= ModalForm::widget(['formType' => 'SummaryForm', 'formModel' => $itemFormModel]) ?>
+<?= ModalForm::widget(['formType' => 'AudioForm', 'formModel' => $itemFormModel]) ?>
+<?= ModalForm::widget(['formType' => 'NewItemForm', 'formModel' => $itemFormModel]) ?>

@@ -22,7 +22,7 @@ use Yii;
  * @property User $createdUser
  * @property Status $summaryStatus
  */
-class DetailForm extends Model
+class ItemForm extends Model
 {
   public $number;
   public $summary_status;

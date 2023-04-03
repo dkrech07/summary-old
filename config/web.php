@@ -51,6 +51,9 @@ $config = [
                 '/site' => '/site/index',
             ],
         ],
+        'dropzone' => [
+            'class' => 'app\components\Dropzone'
+        ]
     ],
     'params' => $params,
 ];

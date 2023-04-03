@@ -55,7 +55,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
             </form>
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
-                <a class="add-summary nav-link active" aria-current="page" href="#">Добавить запись</a>
+                <a class="add-new-item nav-link active" aria-current="page" href="#">Добавить запись</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link active" aria-current="page" href="/site/logout">Выход</a>

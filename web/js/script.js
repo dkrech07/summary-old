@@ -1,4 +1,4 @@
-var addSummaryElement = document.querySelector('.add-summary');
+var addNewItemElement = document.querySelector('.add-new-item');
 var summaryTableElement = document.querySelector('.summary-table');
 
 // Подстветка статусов на элементах списка
@@ -15,49 +15,62 @@ summaryElement.forEach(element => {
 
 // Создание записи
 
-// addSummaryElement.addEventListener('click', evt => {
-//   evt.preventDefault();
-//   openModal(1);
-// });
+addNewItemElement.addEventListener('click', evt => {
+  evt.preventDefault();
+  $('#NewItemModal').modal('show');
+
+  var newItemModalElement = document.querySelector('#NewItemModal');
+  var newAudioElement = newItemModalElement.querySelector('.new-audio');
+  var newDetailElement = newItemModalElement.querySelector('.new-detail');
+
+  newAudioElement.addEventListener('click', evt => {
+    $('#NewItemModal').modal('hide');
+    $('#audioModal').modal('show');
+    var newAudioForm = document.querySelector('#audio');
+    // newAudioForm.reset();
+  });
+
+  newDetailElement.addEventListener('click', evt => {
+    $('#NewItemModal').modal('hide');
+    $('#detailModal').modal('show');
+    var newDetailForm = document.querySelector('#detail');
+    newDetailForm.reset();
+  });
+});
 
 // Редактирование подробного и краткого описания
+var itemEditElement = summaryTableElement.querySelectorAll('.item-edit');
+
 var detailEditElement = summaryTableElement.querySelectorAll('.detail-edit');
 var summaryEditElement = summaryTableElement.querySelectorAll('.summary-edit');
 
-detailEditElement.forEach(element => {
+itemEditElement.forEach(element => {
   element.addEventListener('click', evt => {
+    var editParam = element.classList[1];
 
-    var data = {
-      'item_id': element.parentNode.id
-    };
+    if (editParam === 'detail') {
+      var data = {
+        'item_id_detail': element.parentNode.id
+      };
+    } else if (editParam === 'summary') {
+      var data = {
+        'item_id_summary': element.parentNode.id
+      };
+    }
 
     $.ajax({
       url: '/site/index',
       type: 'POST',
       data: data,
       success: function (response) {
-        var detailData = JSON.parse(response);
-        var detailModalElement = document.querySelector('#detailModal');
-        var detailModalInput = detailModalElement.querySelector('#detailform-detail');
-        console.log(detailModalInput);
-        detailModalInput.value = detailData['detail'];
-        if (detailData) {
-          $('#detailModal').modal('show');
+        var itemData = JSON.parse(response);
+        var itemModalElement = document.querySelector('#' + editParam + 'Modal');
+        var itemModalElementInput = itemModalElement.querySelector('#itemform-' + editParam);
+        console.log(itemModalElementInput);
+        itemModalElementInput.value = itemData[editParam];
+        if (itemData) {
+          $('#' + editParam + 'Modal').modal('show');
         }
-        // customEditForm.querySelector('#customeditform-id').value = detailEdit['ID'];
-        // detailEdit.querySelector('#detailform-detail').value = 'test';
-        // customEditForm.querySelector('#customeditform-namt').value = customEdit['NAMT'];
-        // customEditForm.querySelector('#customeditform-okpo').value = customEdit['OKPO'];
-        // customEditForm.querySelector('#customeditform-ogrn').value = customEdit['OGRN'];
-        // customEditForm.querySelector('#customeditform-inn').value = customEdit['INN'];
-        // customEditForm.querySelector('#customeditform-name_all').value = customEdit['NAME_ALL'];
-        // customEditForm.querySelector('#customeditform-adrtam').value = customEdit['ADRTAM'];
-        // customEditForm.querySelector('#customeditform-prosf').value = customEdit['PROSF'];
-        // customEditForm.querySelector('#customeditform-telefon').value = customEdit['TELEFON'];
-        // customEditForm.querySelector('#customeditform-fax').value = customEdit['FAX'];
-        // customEditForm.querySelector('#customeditform-email').value = customEdit['EMAIL'];
-        // customEditForm.querySelector('#customeditform-coords_latitude').value = customEdit['COORDS_LATITUDE'];
-        // customEditForm.querySelector('#customeditform-coords_longitude').value = customEdit['COORDS_LONGITUDE'];
       }
     });
 
@@ -65,11 +78,26 @@ detailEditElement.forEach(element => {
 });
 
 
-summaryEditElement.forEach(element => {
-  element.addEventListener('click', evt => {
-    openModal(element);
-  });
-});
+// summaryEditElement.forEach(element => {
+//   element.addEventListener('click', evt => {
+
+
+//     $.ajax({
+//       url: '/site/index',
+//       type: 'POST',
+//       data: data,
+//       success: function (response) {
+//         var summaryData = JSON.parse(response);
+//         var itemModalElement = document.querySelector('#itemModal');
+//         var summaryModalInput = itemModalElement.querySelector('#itemform-summary');
+//         summaryModalInput.value = summaryData['summary'];
+//         if (summaryData) {
+//           $('#itemModal').modal('show');
+//         }
+//       }
+//     });
+//   });
+// });
 
 // var openModal = (element) => {
 //   if (element.className === 'detail') {

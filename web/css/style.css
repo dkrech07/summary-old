@@ -33,3 +33,22 @@
 #detailform-detail {
   height: auto;
 }
+
+#NewItemModal .new-audio:hover,
+#NewItemModal .new-detail:hover {
+  cursor: pointer;
+  background-color: #0d6efd;
+  color: #ffffff;
+}
+
+#NewItemModal .new-audio .bi,
+#NewItemModal .new-detail .bi {
+  font-size: 1.2rem;
+  color: #0d6efd;
+}
+
+
+#NewItemModal .new-audio:hover .bi,
+#NewItemModal .new-detail:hover .bi {
+  color: #ffffff;
+}
