@@ -24,7 +24,7 @@ use app\components;
 
         <?php echo Yii::$app->dropzone::widget([
           'options' => [
-            'url' => '/upload',
+            'url' => '/site/upload',
             'maxFilesize' => '200',
 
           ],
@@ -39,7 +39,6 @@ use app\components;
       </div>
 
       <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
       </div>
       <?php ActiveForm::end(); ?>

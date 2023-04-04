@@ -14,8 +14,12 @@ use app\models\SignupForm;
 use app\services\SummaryService;
 use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
-
 use app\models\ItemForm;
+
+use Aws\S3\S3Client;
+use Aws\Exception\AwsException;
+use Aws\S3\MultipartUploader;
+use Aws\Exception\MultipartUploadException;
 
 class SiteController extends SecuredController
 {
@@ -83,33 +87,34 @@ class SiteController extends SecuredController
         return $this->goHome();
     }
 
-    // public function actionUpload()
-    // {
-    //     $file = \yii\web\UploadedFile::getInstanceByName('file');
-    //     print($file);
-    //     // $file->saveAs($_SERVER['DOCUMENT_ROOT'] . '/web/upload' . $file->baseName . '.' . $file->extension);
-    //     // return true;
-    // }
+    // use Aws\S3\S3Client;
+    // use Aws\Exception\AwsException;
 
     public function actionUpload()
     {
-        $fileName = 'upFile';
-        $uploadPath = '/web/site/upload';
+        $sharedConfig = [
+            'credentials' => [
+                // keys
+            ],
+            'version' => 'latest',
+            'endpoint' => 'https://storage.yandexcloud.net',
+            'region' => 'ru-central1',
+        ];
 
-        print($_FILES[$fileName]);
+        $s3Client = new S3Client($sharedConfig);
 
-        if (isset($_FILES[$fileName])) {
-            $file = \yii\web\UploadedFile::getInstanceByName($fileName);
+        // Use multipart upload
+        $source = './upload/Sound_19509.mp3';
+        $uploader = new MultipartUploader($s3Client, $source, [
+            'bucket' => 'summary',
+            'key' => 'Sound_19509.mp3',
+        ]);
 
-            //Print file data
-
-            if ($file->saveAs($uploadPath . '/' . $file->name)) {
-                //Now save file data to database
-
-                echo \yii\helpers\Json::encode($file);
-            }
+        try {
+            $result = $uploader->upload();
+            echo "Upload complete: {$result['ObjectURL']}\n";
+        } catch (MultipartUploadException $e) {
+            echo $e->getMessage() . "\n";
         }
-
-        return false;
     }
 }

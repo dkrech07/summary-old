@@ -53,7 +53,7 @@ $config = [
         ],
         'dropzone' => [
             'class' => 'app\components\Dropzone'
-        ]
+        ],
     ],
     'params' => $params,
 ];

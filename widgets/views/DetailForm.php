@@ -15,7 +15,7 @@ use yii\widgets\ActiveForm;
       </div>
       <?php $form = ActiveForm::begin(['id' => 'detail']); ?>
       <div class="modal-body">
-        <?= $form->field($formModel, 'detail')->textarea(['autofocus' => true, 'rows' => '18'])->label(false) ?>
+        <?= $form->field($formModel, 'detail')->textarea(['autofocus' => true, 'rows' => '18', 'placeholder' => "Добавьте сюда текст"])->label(false) ?>
       </div>
       <div class="modal-footer">
         <button type="submit" class="btn btn-primary">Сохранить изменения</button>
