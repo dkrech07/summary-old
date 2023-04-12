@@ -11,7 +11,6 @@ use Yii;
  * @property int $number
  * @property int $summary_status
  * @property string $title
- * @property string|null $file
  * @property string|null $detail
  * @property string|null $summary
  * @property int $created_user
@@ -39,7 +38,7 @@ class Summary extends \yii\db\ActiveRecord
         return [
             [['number', 'summary_status', 'title', 'created_user', 'created_at', 'updated_at'], 'required'],
             [['number', 'summary_status', 'created_user'], 'integer'],
-            [['file', 'detail', 'summary'], 'string'],
+            [['detail', 'summary'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
             [['title'], 'string', 'max' => 256],
             [['created_user'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['created_user' => 'id']],
@@ -57,7 +56,6 @@ class Summary extends \yii\db\ActiveRecord
             'number' => 'Number',
             'summary_status' => 'Summary Status',
             'title' => 'Title',
-            'file' => 'File',
             'detail' => 'Detail',
             'summary' => 'Summary',
             'created_user' => 'Created User',

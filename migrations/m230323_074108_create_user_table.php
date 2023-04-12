@@ -31,6 +31,14 @@ class m230323_074108_create_user_table extends Migration
             'updated_at' => $this->integer()->notNull(),
         ], $tableOptions);
 
+        $this->createTable('{{%account}}', [
+            'id' => $this->primaryKey(),
+            'user_id' => $this->integer()->notNull(),
+            'y_key_id' => $this->text(),
+            'y_secret_key' => $this->text(),
+            'bucket_name' => $this->text(),
+        ], $tableOptions);
+
         $this->createTable('status', [
             'id' => $this->primaryKey(),
             'status_title' => $this->string(256)->notNull(),
@@ -41,6 +49,7 @@ class m230323_074108_create_user_table extends Migration
             'number' => $this->integer()->notNull(),
             'summary_status' => $this->integer()->notNull(),
             'title' => $this->string(256)->notNull(),
+            'file' => $this->text(),
             'detail' => $this->text(),
             'summary' => $this->text(),
             'created_user' => $this->integer()->notNull(),
@@ -61,6 +70,15 @@ class m230323_074108_create_user_table extends Migration
             'created_user',
             'summary',
             'created_user',
+            'user',
+            'id',
+            'CASCADE'
+        );
+
+        $this->addForeignKey(
+            'user_id',
+            'account',
+            'user_id',
             'user',
             'id',
             'CASCADE'

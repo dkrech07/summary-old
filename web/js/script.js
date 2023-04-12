@@ -1,4 +1,5 @@
 var addNewItemElement = document.querySelector('.add-new-item');
+var settingsElement = document.querySelector('.settings-item');
 var summaryTableElement = document.querySelector('.summary-table');
 
 // Подстветка статусов на элементах списка
@@ -75,6 +76,11 @@ itemEditElement.forEach(element => {
     });
 
   });
+});
+
+settingsElement.addEventListener('click', evt => {
+  evt.preventDefault();
+  $('#accountModal').modal('show');
 });
 
 

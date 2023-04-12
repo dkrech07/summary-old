@@ -15,6 +15,11 @@ use app\services\SummaryService;
 use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
 use app\models\ItemForm;
+use app\models\Account;
+use app\models\AccountForm;
+use yii\widgets\ActiveForm;
+use yii\web\UploadedFile;
+use app\models\Summary;
 
 use Aws\S3\S3Client;
 use Aws\Exception\AwsException;
@@ -35,6 +40,12 @@ class SiteController extends SecuredController
         $user = Yii::$app->user->identity;
         $summaryService = new SummaryService;
         $itemFormModel = new ItemForm();
+        $accountFormModel = new accountForm();
+
+        // Вывод элементов на странице
+        $query = Summary::find()
+            ->orderBy('id DESC')
+            ->joinWith('summaryStatus');
 
         $query = $summaryService->getSummaryItems();
         $countQuery = clone $query;
@@ -42,20 +53,83 @@ class SiteController extends SecuredController
         $models = $query->offset($pages->offset)
             ->limit(15)
             ->all();
-        $data = null;
 
-        if (\Yii::$app->request->isAjax && \Yii::$app->request->post()) {
-            $request = Yii::$app->request;
-            $data = $request->post();
+        // Редактирование учетных данных для Яндекс Storage
+        if ($accountFormModel->load(Yii::$app->request->post())) {
+            $accountFormModel->load(Yii::$app->request->post());
 
-            if (key($data) == 'item_id_detail') {
-                return json_encode((new SummaryService())->getEditSummaryItem($data['item_id_detail']), JSON_UNESCAPED_UNICODE);
+            if (Yii::$app->request->isAjax) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return ActiveForm::validate($accountFormModel);
             }
 
-            if (key($data) == 'item_id_summary') {
-                return json_encode((new SummaryService())->getEditSummaryItem($data['item_id_summary']), JSON_UNESCAPED_UNICODE);
+            if ($accountFormModel->validate()) {
+                $summaryService->editAccount($accountFormModel);
+                $this->refresh();
             }
         }
+
+        // $account = Account::find()
+        //     ->where(['user_id' => $user->id])
+        //     ->one();
+
+        // print_r($account);
+
+        // Загрузка аудиозаписи
+        $itemFormModel->file = $summaryService->uploadFile();
+
+        // Создание и редактирование элемента
+        if ($itemFormModel->load(Yii::$app->request->post())) {
+            $itemFormModel->load(Yii::$app->request->post());
+
+            if (Yii::$app->request->isAjax) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return ActiveForm::validate($itemFormModel);
+            }
+
+            if ($itemFormModel->validate()) {
+                $summaryService->editItem($itemFormModel);
+                $this->refresh();
+            }
+        }
+
+
+
+
+
+
+
+
+        // $data = null;
+
+        // if (\Yii::$app->request->isAjax && \Yii::$app->request->post()) {
+        //     $request = Yii::$app->request;
+        //     $data = $request->post();
+
+        //     if (key($data) == 'item_id_detail') {
+        //         return json_encode((new SummaryService())->getEditSummaryItem($data['item_id_detail']), JSON_UNESCAPED_UNICODE);
+        //     }
+
+        //     if (key($data) == 'item_id_summary') {
+        //         return json_encode((new SummaryService())->getEditSummaryItem($data['item_id_summary']), JSON_UNESCAPED_UNICODE);
+        //     }
+        // }
+
+        // $model1 = new Model1();
+        // $model2 = new Model2();
+
+        // if ($model->load(Yii::$app->request->post())) {
+        //     // обработка первой модели
+        // }
+        // if ($model2->load(Yii::$app->request->post())) {
+        //     // обработка второй модели
+        // }
+
+
+
+
+
+
 
         // if (Yii::$app->request->post('CustomEditForm')) {
         //     $customEditFormModel->load(Yii::$app->request->post());
@@ -69,14 +143,20 @@ class SiteController extends SecuredController
         //     }
         // }
 
+
+
+        //  else {
+        //     return false;
+        // }
+
         return $this->render(
             'index',
             [
                 'user' => $user,
                 'models' => $models,
                 'pages' => $pages,
-                'data' => $data,
                 'itemFormModel' => $itemFormModel,
+                'accountFormModel' => $accountFormModel,
             ]
         );
     }
@@ -92,29 +172,54 @@ class SiteController extends SecuredController
 
     public function actionUpload()
     {
-        $sharedConfig = [
-            'credentials' => [
-                // keys
-            ],
-            'version' => 'latest',
-            'endpoint' => 'https://storage.yandexcloud.net',
-            'region' => 'ru-central1',
-        ];
 
-        $s3Client = new S3Client($sharedConfig);
+        $fileName = 'file';
+        $uploadPath = './upload';
+        if (isset($_FILES[$fileName])) {
+            $file = \yii\web\UploadedFile::getInstanceByName($fileName);
 
-        // Use multipart upload
-        $source = './upload/Sound_19509.mp3';
-        $uploader = new MultipartUploader($s3Client, $source, [
-            'bucket' => 'summary',
-            'key' => 'Sound_19509.mp3',
-        ]);
+            // $fileName = uniqid('file_') . '.' . $file->extension;
+            $fileName = substr(md5(microtime() . rand(0, 9999)), 0, 8) . '.' . $file->extension;
+            $uploadPath = $uploadPath . '/' . $fileName;
+            //Print file data
+            //print_r($file);
+            if ($file->saveAs($uploadPath)) {
+                //Now save file data to database
+                echo \yii\helpers\Json::encode($file);
 
-        try {
-            $result = $uploader->upload();
-            echo "Upload complete: {$result['ObjectURL']}\n";
-        } catch (MultipartUploadException $e) {
-            echo $e->getMessage() . "\n";
+                // Отпрвляем файл в Яндекс Object Storage
+                $user = Yii::$app->user->identity;
+                $account = Account::find()
+                    ->where(['id' => $user->id])
+                    ->one();
+
+                $sharedConfig = [
+                    'credentials' => [
+                        'key' => $account->y_key_id,
+                        'secret' => $account->y_secret_key,
+                    ],
+                    'version' => 'latest',
+                    'endpoint' => 'https://storage.yandexcloud.net',
+                    'region' => 'ru-central1',
+                ];
+
+                $s3Client = new S3Client($sharedConfig);
+
+                // Use multipart upload
+                $uploader = new MultipartUploader($s3Client, $uploadPath, [
+                    'bucket' => $account->bucket_name,
+                    'key' => $fileName,
+                ]);
+
+                try {
+                    $result = $uploader->upload();
+                    echo "Upload complete: {$result['ObjectURL']}\n";
+                } catch (MultipartUploadException $e) {
+                    echo $e->getMessage() . "\n";
+                }
+            }
         }
+
+        return false;
     }
 }

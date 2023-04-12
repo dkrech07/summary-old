@@ -3,20 +3,15 @@
 namespace app\models;
 
 use yii\base\Model;
-
 use Yii;
 
 /**
  * This is the model class for table "summary".
  *
  * @property int $id
- * @property int $number
- * @property int $summary_status
  * @property string $title
  * @property string|null $detail
  * @property string|null $summary
- * @property int $created_user
- * @property string $created_at
  * @property string $updated_at
  *
  * @property User $createdUser
@@ -24,14 +19,10 @@ use Yii;
  */
 class ItemForm extends Model
 {
-  public $number;
-  public $summary_status;
   public $title;
+  public $file;
   public $detail;
   public $summary;
-  public $created_user;
-  public $created_at;
-  public $updated_at;
 
   /**
    * {@inheritdoc}
@@ -47,13 +38,9 @@ class ItemForm extends Model
   public function rules()
   {
     return [
-      [['number', 'summary_status', 'title', 'created_user', 'created_at', 'updated_at'], 'required'],
-      [['number', 'summary_status', 'created_user'], 'integer'],
-      [['detail', 'summary'], 'string'],
-      [['created_at', 'updated_at'], 'safe'],
+      [['title'], 'required'],
+      [['file', 'detail', 'summary'], 'string'],
       [['title'], 'string', 'max' => 256],
-      [['created_user'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['created_user' => 'id']],
-      [['summary_status'], 'exist', 'skipOnError' => true, 'targetClass' => Status::class, 'targetAttribute' => ['summary_status' => 'id']],
     ];
   }
 
@@ -64,34 +51,10 @@ class ItemForm extends Model
   {
     return [
       'id' => 'ID',
-      'number' => 'Number',
-      'summary_status' => 'Summary Status',
       'title' => 'Название записи',
+      'file' => 'File',
       'detail' => 'Подробный текст',
       'summary' => 'Краткий текст',
-      'created_user' => 'Пользователь',
-      'created_at' => 'Дата создания',
-      'updated_at' => 'Дата обновления',
     ];
-  }
-
-  /**
-   * Gets query for [[CreatedUser]].
-   *
-   * @return \yii\db\ActiveQuery
-   */
-  public function getCreatedUser()
-  {
-    return $this->hasOne(User::class, ['id' => 'created_user']);
-  }
-
-  /**
-   * Gets query for [[SummaryStatus]].
-   *
-   * @return \yii\db\ActiveQuery
-   */
-  public function getSummaryStatus()
-  {
-    return $this->hasOne(Status::class, ['id' => 'summary_status']);
   }
 }

@@ -68,6 +68,7 @@
     "require": {
         "perminder-klair/yii2-dropzone": "dev-master",
         "yiisoft/yii2-bootstrap5": "^2.0",
-        "aws/aws-sdk-php": "^3.263"
+        "aws/aws-sdk-php": "^3.263",
+        "yiisoft/yii2-faker": "^2.0"
     }
 }
