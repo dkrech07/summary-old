@@ -39,8 +39,9 @@ class ItemForm extends Model
   {
     return [
       [['title'], 'required'],
-      [['file', 'detail', 'summary'], 'string'],
+      [['detail', 'summary'], 'string'],
       [['title'], 'string', 'max' => 256],
+      [['file'], 'file'],
     ];
   }
 

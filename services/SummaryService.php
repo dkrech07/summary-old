@@ -13,6 +13,8 @@ use Aws\S3\S3Client;
 use Aws\Exception\AwsException;
 use Aws\S3\MultipartUploader;
 use Aws\Exception\MultipartUploadException;
+use yii\web\UploadedFile;
+
 // use Yii;
 // use app\models\Replies;
 // use app\models\AddTaskForm;
@@ -62,6 +64,42 @@ class SummaryService
   }
 
 
+  public function uploadYandexStorage($uploadPath, $fileName)
+  {
+    // Отпрвляем файл в Яндекс Object Storage
+    $user = Yii::$app->user->identity;
+    $account = Account::find()
+      ->where(['user_id' => $user->id])
+      ->one();
+
+    $sharedConfig = [
+      'credentials' => [
+        'key' => $account->y_key_id,
+        'secret' => $account->y_secret_key,
+      ],
+      'version' => 'latest',
+      'endpoint' => 'https://storage.yandexcloud.net',
+      'region' => 'ru-central1',
+    ];
+
+    $s3Client = new S3Client($sharedConfig);
+
+    // Use multipart upload
+    $uploader = new MultipartUploader($s3Client, $uploadPath, [
+      'bucket' => $account->bucket_name,
+      'key' => $fileName,
+    ]);
+
+    try {
+      $result = $uploader->upload();
+      echo "Upload complete: {$result['ObjectURL']}\n";
+    } catch (MultipartUploadException $e) {
+      echo $e->getMessage() . "\n";
+    }
+
+    unlink($uploadPath);
+    return $account->bucket_name . '/' . $fileName;
+  }
 
 
   // Создание и редактирование элемента
@@ -74,7 +112,13 @@ class SummaryService
 
     $newItem = new Summary;
 
-    $newItem->file = $itemFormModel->file;
+    if ($itemFormModel->file) {
+      $fileName = substr(md5(microtime() . rand(0, 9999)), 0, 8) . '.' . $itemFormModel->file->extension;
+      $uploadPath = './upload' . '/' . $fileName;
+      $itemFormModel->file->saveAs($uploadPath);
+      $newItem->file = $this->uploadYandexStorage($uploadPath, $fileName);
+    }
+
     $newItem->number = $editSummaryItem + 1;
     $newItem->summary_status = 1;
     $newItem->title = $itemFormModel->title;
@@ -95,6 +139,8 @@ class SummaryService
       $transaction->rollBack();
     }
   }
+
+
 
   // /**
   //  * @param int $id
@@ -240,7 +286,7 @@ class SummaryService
         // Отпрвляем файл в Яндекс Object Storage
         $user = Yii::$app->user->identity;
         $account = Account::find()
-          ->where(['id' => $user->id])
+          ->where(['user_id' => $user->id])
           ->one();
 
         $sharedConfig = [

@@ -24,18 +24,7 @@ use app\components;
           <?= $form->field($formModel, 'title')->textInput(['autofocus' => true, 'placeholder' => "Краткая информация о записи диалога"]) ?>
         </div>
         <div class="mb-3">
-          <?php echo Yii::$app->dropzone::widget([
-            'options' => [
-              'url' => '/site/index',
-              'maxFilesize' => '200',
-
-            ],
-            'clientEvents' => [
-              'complete' => "function(file){console.log(file)}",
-              'removedfile' => "function(file){alert(file.name + ' is removed')}",
-            ],
-          ]);
-          ?>
+          <?= $form->field($formModel, 'file')->fileInput() ?>
         </div>
       </div>
       <div class="modal-footer">

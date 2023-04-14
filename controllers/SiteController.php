@@ -75,12 +75,26 @@ class SiteController extends SecuredController
 
         // print_r($account);
 
-        // Загрузка аудиозаписи
-        $itemFormModel->file = $summaryService->uploadFile();
+        // // Загрузка аудиозаписи
+        // $itemFormModel->file = $summaryService->uploadFile();
+
+        // $model = new UploadForm();
+
+        // if (Yii::$app->request->isPost) {
+        //     $model->file = UploadedFile::getInstance($model, 'file');
+
+        //     if ($model->file && $model->validate()) {
+        //         $model->file->saveAs('uploads/' . $model->file->baseName . '.' . $model->file->extension);
+        //     }
+        // }
+
+        // return $this->render('upload', ['model' => $model]);
 
         // Создание и редактирование элемента
         if ($itemFormModel->load(Yii::$app->request->post())) {
+
             $itemFormModel->load(Yii::$app->request->post());
+            $itemFormModel->file = UploadedFile::getInstance($itemFormModel, 'file');
 
             if (Yii::$app->request->isAjax) {
                 Yii::$app->response->format = Response::FORMAT_JSON;
@@ -89,6 +103,7 @@ class SiteController extends SecuredController
 
             if ($itemFormModel->validate()) {
                 $summaryService->editItem($itemFormModel);
+                // exit;
                 $this->refresh();
             }
         }
@@ -172,54 +187,37 @@ class SiteController extends SecuredController
 
     public function actionUpload()
     {
+        $user = Yii::$app->user->identity;
+        $account = Account::find()
+            ->where(['user_id' => $user->id])
+            ->one();
 
-        $fileName = 'file';
-        $uploadPath = './upload';
-        if (isset($_FILES[$fileName])) {
-            $file = \yii\web\UploadedFile::getInstanceByName($fileName);
+        $token = 'ajef9nnkandea5a1k7gd'; # IAM-токен
+        $folderId = 'b1gpblg4vkajavqdadqh'; # Идентификатор каталога
+        $audioFileName = "2a6c5b1b.mp3";
 
-            // $fileName = uniqid('file_') . '.' . $file->extension;
-            $fileName = substr(md5(microtime() . rand(0, 9999)), 0, 8) . '.' . $file->extension;
-            $uploadPath = $uploadPath . '/' . $fileName;
-            //Print file data
-            //print_r($file);
-            if ($file->saveAs($uploadPath)) {
-                //Now save file data to database
-                echo \yii\helpers\Json::encode($file);
+        $file = fopen($audioFileName, 'rb');
 
-                // Отпрвляем файл в Яндекс Object Storage
-                $user = Yii::$app->user->identity;
-                $account = Account::find()
-                    ->where(['id' => $user->id])
-                    ->one();
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "https://stt.api.cloud.yandex.net/speech/v1/stt:recognize?lang=ru-RU&folderId=${folderId}&format=oggopus");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $token, 'Transfer-Encoding: chunked'));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
 
-                $sharedConfig = [
-                    'credentials' => [
-                        'key' => $account->y_key_id,
-                        'secret' => $account->y_secret_key,
-                    ],
-                    'version' => 'latest',
-                    'endpoint' => 'https://storage.yandexcloud.net',
-                    'region' => 'ru-central1',
-                ];
-
-                $s3Client = new S3Client($sharedConfig);
-
-                // Use multipart upload
-                $uploader = new MultipartUploader($s3Client, $uploadPath, [
-                    'bucket' => $account->bucket_name,
-                    'key' => $fileName,
-                ]);
-
-                try {
-                    $result = $uploader->upload();
-                    echo "Upload complete: {$result['ObjectURL']}\n";
-                } catch (MultipartUploadException $e) {
-                    echo $e->getMessage() . "\n";
-                }
-            }
+        curl_setopt($ch, CURLOPT_INFILE, $file);
+        curl_setopt($ch, CURLOPT_INFILESIZE, filesize($audioFileName));
+        $res = curl_exec($ch);
+        curl_close($ch);
+        $decodedResponse = json_decode($res, true);
+        if (isset($decodedResponse["result"])) {
+            echo $decodedResponse["result"];
+        } else {
+            echo "Error code: " . $decodedResponse["error_code"] . "\r\n";
+            echo "Error message: " . $decodedResponse["error_message"] . "\r\n";
         }
 
-        return false;
+        fclose($file);
     }
 }

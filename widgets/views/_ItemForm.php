@@ -57,3 +57,16 @@ use yii\widgets\ActiveForm;
   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
 </div>
 <?php ActiveForm::end(); ?>
+
+<?php echo Yii::$app->dropzone::widget([
+  'options' => [
+    'url' => '/site/index',
+    'maxFilesize' => '200',
+
+  ],
+  'clientEvents' => [
+    'complete' => "function(file){console.log(file)}",
+    'removedfile' => "function(file){alert(file.name + ' is removed')}",
+  ],
+]);
+?>
