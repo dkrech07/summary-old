@@ -24,7 +24,7 @@ use app\components;
           <?= $form->field($formModel, 'title')->textInput(['autofocus' => true, 'placeholder' => "Краткая информация о записи диалога"]) ?>
         </div>
         <div class="mb-3">
-          <?= $form->field($formModel, 'file')->fileInput() ?>
+          <?= $form->field($formModel, 'file')->fileInput(['required' => true]) ?>
         </div>
       </div>
       <div class="modal-footer">

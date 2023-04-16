@@ -26,6 +26,12 @@ use Aws\Exception\AwsException;
 use Aws\S3\MultipartUploader;
 use Aws\Exception\MultipartUploadException;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Psr7\Request;
+
 class SiteController extends SecuredController
 {
     public $layout = 'summary';
@@ -108,9 +114,13 @@ class SiteController extends SecuredController
             }
         }
 
+        $summaryService->getDescription();
 
 
-
+        // print_r(Summary::find()
+        //     ->where(['id' => 39])
+        //     ->one());
+        // ->joinWith('summaryStatus'))
 
 
 
@@ -122,7 +132,10 @@ class SiteController extends SecuredController
         //     $data = $request->post();
 
         //     if (key($data) == 'item_id_detail') {
-        //         return json_encode((new SummaryService())->getEditSummaryItem($data['item_id_detail']), JSON_UNESCAPED_UNICODE);
+        //         // return json_encode($summaryService->getEditSummaryItem($data['item_id_detail']), JSON_UNESCAPED_UNICODE);
+
+        //         print_r($summaryService->getEditSummaryItem($data['item_id_detail']));
+        //         return json_encode($summaryService->getEditSummaryItem($data['item_id_detail']));
         //     }
 
         //     if (key($data) == 'item_id_summary') {
@@ -185,6 +198,30 @@ class SiteController extends SecuredController
     // use Aws\S3\S3Client;
     // use Aws\Exception\AwsException;
 
+    public function actionEdit()
+    {
+        $user = Yii::$app->user->identity;
+        $summaryService = new SummaryService;
+        $itemFormModel = new ItemForm();
+        $accountFormModel = new accountForm();
+
+        if (\Yii::$app->request->isAjax && \Yii::$app->request->post()) {
+            $request = Yii::$app->request;
+            $data = $request->post();
+
+            if (key($data) == 'item_id_detail') {
+                // return json_encode($summaryService->getEditSummaryItem($data['item_id_detail']), JSON_UNESCAPED_UNICODE);
+
+                // print_r($summaryService->getEditSummaryItem($data['item_id_detail']));
+                return json_encode($summaryService->getEditSummaryItem($data['item_id_detail']), JSON_UNESCAPED_UNICODE);
+            }
+
+            if (key($data) == 'item_id_summary') {
+                return json_encode((new SummaryService())->getEditSummaryItem($data['item_id_summary']), JSON_UNESCAPED_UNICODE);
+            }
+        }
+    }
+
     public function actionUpload()
     {
         $user = Yii::$app->user->identity;
@@ -219,5 +256,130 @@ class SiteController extends SecuredController
         }
 
         fclose($file);
+    }
+
+    public function actionDecode()
+    {
+        // $geocode = 'Москва';
+
+        // $query = http_build_query([
+        //     'format' => 'json',
+        //     'q' => $geocode,
+        //     'polygon_geojson' => 1,
+        // ]);
+
+        $url = "https://transcribe.api.cloud.yandex.net";
+
+        // $url = "http://nominatim.openstreetmap.org/search?$query";
+        $client = new Client([
+            'base_uri' => $url,
+        ]);
+
+
+        $response = $client->request('POST', '/speech/stt/v2/longRunningRecognize', [
+            'headers' => [
+                'Authorization' => 'Api-Key AQVNxpT5cvi9T36mk3HbRFMYVMl-HgfwlEHDuZnT'
+            ],
+            'json' => [
+                'config' => [
+                    'specification' => [
+                        'languageCode' => 'ru-RU',
+                        'model' => 'general',
+                        // 'profanityFilter' => true,
+                        'audioEncoding' => 'MP3',
+                        // 'sampleRateHertz' => '48000',
+                        // 'audioChannelCount' => '1'
+                    ]
+                ],
+                'audio' => [
+                    'uri' => 'https://storage.yandexcloud.net/summary/1659103f.mp3'
+                ]
+            ]
+        ]);
+
+        $body = $response->getBody();
+        $arr_body = json_decode($body);
+        print_r($arr_body);
+
+        // stdClass Object ( [done] => [id] => e0377jv3i8026r52eva3 [createdAt] => 2023-04-16T08:22:49Z [createdBy] => aje9jg4as25k6r43n4op [modifiedAt] => 2023-04-16T08:22:49Z )
+
+        // $request = new Request('PUT', $url);
+        // $response = $client->send($request);
+        // $content = $response->getBody()->getContents();
+        // $responseData = json_decode($content, false);
+
+        // "config" => [
+        //     "specification" => [
+        //         "languageCode" => "string",
+        //         "model" => "string",
+        //         "profanityFilter" => "string",
+        //         "audioEncoding" => "string",
+        //         "sampleRateHertz" => "integer",
+        //         "audioChannelCount" => "integer"
+        //     ]
+        // ],
+        // "audio" => [
+        //     "uri" => "string"
+        // ]
+    }
+
+    public function actionDescription()
+    {
+        // $geocode = 'Москва';
+
+        // $query = http_build_query([
+        //     'format' => 'json',
+        //     'q' => $geocode,
+        //     'polygon_geojson' => 1,
+        // ]);
+
+        $url = "https://operation.api.cloud.yandex.net/operations/";
+
+        // $url = "http://nominatim.openstreetmap.org/search?$query";
+        $client = new Client([
+            'base_uri' => $url,
+        ]);
+
+
+        $response = $client->request('GET', 'e036ejtlftpso6dlk6pr', [
+            'headers' => [
+                'Authorization' => 'Api-Key AQVNxpT5cvi9T36mk3HbRFMYVMl-HgfwlEHDuZnT'
+            ]
+        ]);
+
+        $body = $response->getBody();
+        $arr_body = json_decode($body);
+        print($arr_body->done);
+        // print('<br>');
+        // print('<br>');
+        // // print_r(count($arr_body->response->chunks));
+        // print('<br>');
+        // print('<br>');
+        // print_r($arr_body->response->chunks[0]->alternatives[0]->text);
+        // print('<br>');
+        // print('<br>');
+
+        // print_r($arr_body);
+
+        // stdClass Object ( [done] => [id] => e0377jv3i8026r52eva3 [createdAt] => 2023-04-16T08:22:49Z [createdBy] => aje9jg4as25k6r43n4op [modifiedAt] => 2023-04-16T08:22:49Z )
+
+        // $request = new Request('PUT', $url);
+        // $response = $client->send($request);
+        // $content = $response->getBody()->getContents();
+        // $responseData = json_decode($content, false);
+
+        // "config" => [
+        //     "specification" => [
+        //         "languageCode" => "string",
+        //         "model" => "string",
+        //         "profanityFilter" => "string",
+        //         "audioEncoding" => "string",
+        //         "sampleRateHertz" => "integer",
+        //         "audioChannelCount" => "integer"
+        //     ]
+        // ],
+        // "audio" => [
+        //     "uri" => "string"
+        // ]
     }
 }

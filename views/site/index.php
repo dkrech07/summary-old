@@ -68,3 +68,7 @@ $this->title = 'My Yii Application';
 <?= ModalForm::widget(['formType' => 'AudioForm', 'formModel' => $itemFormModel]) ?>
 <?= ModalForm::widget(['formType' => 'NewItemForm', 'formModel' => $itemFormModel]) ?>
 <?= ModalForm::widget(['formType' => 'AccountForm', 'formModel' => $accountFormModel]) ?>
+
+<!-- <div class="loader mb-3">
+    <img class="loader-img img-fluid img-thumbnail" src="img/loader.gif" alt="loader">
+</div> -->

@@ -50,6 +50,7 @@ class m230323_074108_create_user_table extends Migration
             'summary_status' => $this->integer()->notNull(),
             'title' => $this->string(256)->notNull(),
             'file' => $this->text(),
+            'decode_id' => $this->text(),
             'detail' => $this->text(),
             'summary' => $this->text(),
             'created_user' => $this->integer()->notNull(),

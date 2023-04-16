@@ -7,9 +7,12 @@ var summaryElement = summaryTableElement.querySelectorAll('.summary-item');
 summaryElement.forEach(element => {
   statusElement = element.querySelector('.status');
   if (statusElement.dataset.status == 3) {
+    statusElement.style.color = 'blue';
+  }
+  if (statusElement.dataset.status == 2) {
     statusElement.style.color = 'green';
   }
-  if (statusElement.dataset.status == 4) {
+  if (statusElement.dataset.status == 1) {
     statusElement.style.color = 'red';
   }
 });
@@ -60,15 +63,19 @@ itemEditElement.forEach(element => {
     }
 
     $.ajax({
-      url: '/site/index',
+      url: '/site/edit',
       type: 'POST',
       data: data,
       success: function (response) {
         var itemData = JSON.parse(response);
+        console.log(data);
+        console.log(itemData);
         var itemModalElement = document.querySelector('#' + editParam + 'Modal');
         var itemModalElementInput = itemModalElement.querySelector('#itemform-' + editParam);
+        var itemModalElementTitle = itemModalElement.querySelector('#itemform-' + 'title');
         console.log(itemModalElementInput);
         itemModalElementInput.value = itemData[editParam];
+        itemModalElementTitle.value = itemData['title'];
         if (itemData) {
           $('#' + editParam + 'Modal').modal('show');
         }
@@ -83,6 +90,12 @@ settingsElement.addEventListener('click', evt => {
   $('#accountModal').modal('show');
 });
 
+// $('#audioModal').modal('show');
+
+$(document).on('pjax:beforeSend', function () {
+  // $('.appeal-list').hide();
+  $('#loader').show();
+})
 
 // summaryEditElement.forEach(element => {
 //   element.addEventListener('click', evt => {

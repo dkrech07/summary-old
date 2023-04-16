@@ -15,6 +15,11 @@ use Aws\S3\MultipartUploader;
 use Aws\Exception\MultipartUploadException;
 use yii\web\UploadedFile;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Psr7\Request;
 // use Yii;
 // use app\models\Replies;
 // use app\models\AddTaskForm;
@@ -61,6 +66,133 @@ class SummaryService
     // }
 
     return $query;
+  }
+
+  public function getDescription()
+  {
+    for ($i = 0; $i < 30; $i++) {
+
+      $user = Yii::$app->user->identity;
+      $summaryList = Summary::find()
+        ->where(['created_user' => $user->id, 'summary_status' => 1])
+        ->all();
+
+      if ($summaryList) {
+        foreach ($summaryList as $item) {
+          if (isset($item->decode_id)) {
+            $url = "https://operation.api.cloud.yandex.net/operations/";
+
+            $client = new Client([
+              'base_uri' => $url,
+            ]);
+
+            $response = $client->request('GET', $item->decode_id, [
+              'headers' => [
+                'Authorization' => 'Api-Key AQVNxpT5cvi9T36mk3HbRFMYVMl-HgfwlEHDuZnT'
+              ]
+            ]);
+
+            $body = $response->getBody();
+            $arr_body = json_decode($body);
+
+            if ($arr_body->done) {
+              $item->detail = $arr_body->response->chunks[0]->alternatives[0]->text;
+              $item->updated_at = $this->getCurrentDate();
+              $item->summary_status = 2;
+
+              $transaction = Yii::$app->db->beginTransaction();
+              try {
+                $item->save();
+                $transaction->commit();
+              } catch (\Exception $e) {
+                $transaction->rollBack();
+                throw $e;
+              } catch (\Throwable $e) {
+                $transaction->rollBack();
+              }
+            }
+          } else {
+
+            $item->updated_at = $this->getCurrentDate();
+            $item->summary_status = 4;
+
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+              $item->save();
+              $transaction->commit();
+            } catch (\Exception $e) {
+              $transaction->rollBack();
+              throw $e;
+            } catch (\Throwable $e) {
+              $transaction->rollBack();
+            }
+          }
+
+
+          // print($item->title);
+          // print('<br>');
+          // print($item->decode_id);
+          // print('<br>');
+          // print('<br>');
+        }
+      } else {
+        return true;
+      }
+      sleep(10);
+    }
+    // foreach ($summary as $item) {
+    //   print($item->title);
+    //   print('<br>');
+    //   print($item->decode_id);
+    //   print('<br>');
+    //   print('<br>');
+    // }
+
+    // print_r($summary);
+    // exit;
+
+    // for ($i = 0; $i < 3; $i++) {
+
+
+
+
+    //   sleep(10);
+    // }
+  }
+
+
+  public function decodeAudio($yandexStorageFile)
+  {
+    $url = "https://transcribe.api.cloud.yandex.net";
+
+    $client = new Client([
+      'base_uri' => $url,
+    ]);
+
+    $response = $client->request('POST', '/speech/stt/v2/longRunningRecognize', [
+      'headers' => [
+        'Authorization' => 'Api-Key AQVNxpT5cvi9T36mk3HbRFMYVMl-HgfwlEHDuZnT'
+      ],
+      'json' => [
+        'config' => [
+          'specification' => [
+            'languageCode' => 'ru-RU',
+            'model' => 'general',
+            // 'profanityFilter' => true,
+            'audioEncoding' => 'MP3',
+            // 'sampleRateHertz' => '48000',
+            // 'audioChannelCount' => '1'
+          ]
+        ],
+        'audio' => [
+          'uri' => 'https://storage.yandexcloud.net/' . $yandexStorageFile,
+        ]
+      ]
+    ]);
+
+    $body = $response->getBody();
+    $arr_body = json_decode($body);
+    return $arr_body->id;
   }
 
 
@@ -117,10 +249,12 @@ class SummaryService
       $uploadPath = './upload' . '/' . $fileName;
       $itemFormModel->file->saveAs($uploadPath);
       $newItem->file = $this->uploadYandexStorage($uploadPath, $fileName);
+
+      $newItem->decode_id = $this->decodeAudio($newItem->file);
+      $newItem->summary_status = 1;
     }
 
     $newItem->number = $editSummaryItem + 1;
-    $newItem->summary_status = 1;
     $newItem->title = $itemFormModel->title;
     $newItem->detail = $itemFormModel->detail;
     $newItem->summary = $itemFormModel->summary;
@@ -169,17 +303,19 @@ class SummaryService
     $detailFormModel = new ItemForm();
 
     $editSummaryItem = Summary::find()
-      ->where(['ID' => $data])
+      ->where(['id' => $data])
       ->one();
 
-    $detailFormModel->number = $editSummaryItem->number;
-    $detailFormModel->summary_status = $editSummaryItem->summary_status;
     $detailFormModel->title = $editSummaryItem->title;
     $detailFormModel->detail = $editSummaryItem->detail;
-    $detailFormModel->summary = $editSummaryItem->summary;
-    $detailFormModel->created_user = $editSummaryItem->created_user;
-    $detailFormModel->created_at = $editSummaryItem->created_at;
-    $detailFormModel->updated_at = $editSummaryItem->updated_at;
+
+
+    // $detailFormModel->number = $editSummaryItem->number;
+    // $detailFormModel->summary_status = $editSummaryItem->summary_status;
+    // $detailFormModel->summary = $editSummaryItem->summary;
+    // $detailFormModel->created_user = $editSummaryItem->created_user;
+    // $detailFormModel->created_at = $editSummaryItem->created_at;
+    // $detailFormModel->updated_at = $editSummaryItem->updated_at;
 
     return $detailFormModel;
   }
