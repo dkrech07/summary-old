@@ -11,6 +11,7 @@ use Yii;
  * @property int $user_id
  * @property string|null $y_key_id
  * @property string|null $y_secret_key
+ * @property string|null $api_secret_key
  * @property string|null $bucket_name
  *
  * @property User $user
@@ -33,7 +34,7 @@ class Account extends \yii\db\ActiveRecord
         return [
             [['user_id'], 'required'],
             [['user_id'], 'integer'],
-            [['y_key_id', 'y_secret_key', 'bucket_name'], 'string'],
+            [['y_key_id', 'y_secret_key', 'api_secret_key', 'bucket_name'], 'string'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
@@ -48,6 +49,7 @@ class Account extends \yii\db\ActiveRecord
             'user_id' => 'User ID',
             'y_key_id' => 'Y Key ID',
             'y_secret_key' => 'Y Secret Key',
+            'api_secret_key' => 'Api Secret Key',
             'bucket_name' => 'Bucket Name',
         ];
     }

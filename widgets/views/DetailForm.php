@@ -15,11 +15,12 @@ use yii\widgets\ActiveForm;
       </div>
       <?php $form = ActiveForm::begin(['id' => 'detail']); ?>
       <div class="modal-body">
+        <div class="tabs"></div>
         <div class="mb-3">
           <?= $form->field($formModel, 'title')->textInput(['autofocus' => true, 'placeholder' => "Краткая информация о записи диалога"]) ?>
         </div>
         <div class="mb-3">
-          <?= $form->field($formModel, 'detail')->textarea(['rows' => '18', 'placeholder' => "Добавьте сюда текст"])->label(false) ?>
+          <?= $form->field($formModel, 'detail')->textarea(['rows' => '18', 'placeholder' => "Добавьте сюда текст"]) ?>
         </div>
       </div>
       <div class="modal-footer">

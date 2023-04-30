@@ -15,6 +15,7 @@ use Yii;
  */
 class AccountForm extends Model
 {
+  public $api_secret_key;
   public $y_key_id;
   public $y_secret_key;
   public $bucket_name;
@@ -33,7 +34,7 @@ class AccountForm extends Model
   public function rules()
   {
     return [
-      [['y_key_id', 'y_secret_key', 'bucket_name'], 'string'],
+      [['y_key_id', 'y_secret_key', 'api_secret_key', 'bucket_name'], 'string'],
     ];
   }
 
@@ -44,8 +45,9 @@ class AccountForm extends Model
   {
     return [
       'id' => 'ID',
-      'y_key_id' => 'Yandex key ID',
-      'y_secret_key' => 'Yandex secret Key',
+      'y_key_id' => 'Ключ доступа',
+      'y_secret_key' => 'Ключ доступа',
+      'api_secret_key' => 'API-ключ',
       'bucket_name' => 'Bucket Name',
     ];
   }

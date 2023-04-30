@@ -10,13 +10,16 @@ use yii\widgets\ActiveForm;
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="modalLabel">Настройки для Yandex Storage</h5>
+        <h5 class="modal-title" id="modalLabel">Настройки для Object Storage</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
       </div>
       <?php $form = ActiveForm::begin(['id' => 'account']); ?>
       <div class="modal-body">
         <div class="mb-3">
-          <?= $form->field($formModel, 'y_key_id')->textInput(['autofocus' => true, 'placeholder' => "Указите статический ключ"]); ?>
+          <?= $form->field($formModel, 'api_secret_key')->textInput(['autofocus' => true, 'placeholder' => "Укажите секретный API ключ"]); ?>
+        </div>
+        <div class="mb-3">
+          <?= $form->field($formModel, 'y_key_id')->textInput(['placeholder' => "Указите статический ключ"]); ?>
         </div>
         <div class="mb-3">
           <?= $form->field($formModel, 'y_secret_key')->textInput(['placeholder' => "Укажите секретный ключ"]); ?>

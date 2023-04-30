@@ -68,9 +68,25 @@ itemEditElement.forEach(element => {
       data: data,
       success: function (response) {
         var itemData = JSON.parse(response);
-        console.log(data);
-        console.log(itemData);
+        // var itemData = JSON.stringify(response);
+        // console.log(data);
+        // console.log(itemData);
         var itemModalElement = document.querySelector('#' + editParam + 'Modal');
+
+        var tabs = itemModalElement.querySelector('.tabs');
+        itemData.forEach((element, index, array) => {
+          console.log(element);
+          var tabElement = document.createElement("button");
+          tabElement.className = "btn btn-primary";
+          tabElement.type = 'button';
+          tabElement.textContent = 'Вариант ' + (index + 1);
+          tabs.appendChild(tabElement);
+        });
+
+        // <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">Open modal for @mdo</button>
+
+        console.log(tabs);
+
         var itemModalElementInput = itemModalElement.querySelector('#itemform-' + editParam);
         var itemModalElementTitle = itemModalElement.querySelector('#itemform-' + 'title');
         console.log(itemModalElementInput);

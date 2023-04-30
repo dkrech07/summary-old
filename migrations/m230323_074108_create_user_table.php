@@ -36,13 +36,14 @@ class m230323_074108_create_user_table extends Migration
             'user_id' => $this->integer()->notNull(),
             'y_key_id' => $this->text(),
             'y_secret_key' => $this->text(),
+            'api_secret_key' => $this->text(),
             'bucket_name' => $this->text(),
         ], $tableOptions);
 
         $this->createTable('status', [
             'id' => $this->primaryKey(),
             'status_title' => $this->string(256)->notNull(),
-        ]);
+        ], $tableOptions);
 
         $this->createTable('{{%summary}}', [
             'id' => $this->primaryKey(),
@@ -56,7 +57,22 @@ class m230323_074108_create_user_table extends Migration
             'created_user' => $this->integer()->notNull(),
             'created_at' => $this->dateTime()->notNull(),
             'updated_at' => $this->dateTime()->notNull(),
-        ]);
+        ], $tableOptions);
+
+        $this->createTable('{{%detail}}', [
+            'id' => $this->primaryKey(),
+            'summary_id' => $this->integer()->notNull(),
+            'detail_text' => $this->text(),
+        ], $tableOptions);
+
+        $this->addForeignKey(
+            'summary_id',
+            'detail',
+            'summary_id',
+            'summary',
+            'id',
+            'CASCADE'
+        );
 
         $this->addForeignKey(
             'summary_status',
@@ -94,5 +110,6 @@ class m230323_074108_create_user_table extends Migration
         $this->dropTable('user');
         $this->dropTable('summary');
         $this->dropTable('status');
+        $this->dropTable('detail');
     }
 }

@@ -7,28 +7,21 @@ use app\models\AccountForm;
 use app\models\Summary;
 use app\models\ItemForm;
 use app\models\Account;
+use app\models\Detail;
+use app\models\DetailForm;
 use yii\db\Expression;
-
 use Aws\S3\S3Client;
-use Aws\Exception\AwsException;
 use Aws\S3\MultipartUploader;
 use Aws\Exception\MultipartUploadException;
-use yii\web\UploadedFile;
-
 use GuzzleHttp\Client;
+
+use Aws\Exception\AwsException;
+use yii\web\UploadedFile;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Request;
-// use Yii;
-// use app\models\Replies;
-// use app\models\AddTaskForm;
-// use app\models\TasksFiles;
-// use app\models\Cities;
-// use yii\web\Response;
-// use yii\widgets\ActiveForm;
-// use TaskForce\utils\CustomHelpers;
-// use yii\db\Expression;
+
 
 class SummaryService
 {
@@ -43,38 +36,22 @@ class SummaryService
   }
 
   public function getSummaryItems()
-  // public function getSummaryItems(TasksSearchForm $model): object
   {
-    $query = Summary::find()
+    return Summary::find()
       ->orderBy('id DESC')
       ->joinWith('summaryStatus');
-    // ->where(['tasks.status' => 'new'])
-    // ->orderBy('dt_add DESC');
-
-    // if ($model->categories) {
-    //   $query->andWhere(['in', 'category_id', $model->categories]);
-    // }
-
-    // if ($model->without_executor) {
-    //   $query->andWhere(['executor_id' => null]);
-    // }
-
-    // settype($model->period, 'integer');
-    // if ($model->period > 0) {
-    //   $exp = new Expression("DATE_SUB(NOW(), INTERVAL {$model->period} HOUR)");
-    //   $query->andWhere(['>', 'dt_add', $exp]);
-    // }
-
-    return $query;
   }
 
   public function getDescription()
   {
+    $account = Account::find()
+      ->where(['user_id' => Yii::$app->user->identity->id])
+      ->one();
+
     for ($i = 0; $i < 30; $i++) {
 
-      $user = Yii::$app->user->identity;
       $summaryList = Summary::find()
-        ->where(['created_user' => $user->id, 'summary_status' => 1])
+        ->where(['created_user' => Yii::$app->user->identity->id, 'summary_status' => 1])
         ->all();
 
       if ($summaryList) {
@@ -88,7 +65,7 @@ class SummaryService
 
             $response = $client->request('GET', $item->decode_id, [
               'headers' => [
-                'Authorization' => 'Api-Key AQVNxpT5cvi9T36mk3HbRFMYVMl-HgfwlEHDuZnT'
+                'Authorization' => 'Api-Key ' . $account->api_secret_key
               ]
             ]);
 
@@ -110,9 +87,27 @@ class SummaryService
               } catch (\Throwable $e) {
                 $transaction->rollBack();
               }
+
+              $chunksList = $arr_body->response->chunks;
+              foreach ($chunksList as $chunkItem) {
+                $newDetail = new Detail;
+
+                $newDetail->summary_id = $item->id;
+                $newDetail->detail_text = $chunkItem->alternatives[0]->text;
+
+                $transaction2 = Yii::$app->db->beginTransaction();
+                try {
+                  $newDetail->save();
+                  $transaction2->commit();
+                } catch (\Exception $e) {
+                  $transaction2->rollBack();
+                  throw $e;
+                } catch (\Throwable $e) {
+                  $transaction2->rollBack();
+                }
+              }
             }
           } else {
-
             $item->updated_at = $this->getCurrentDate();
             $item->summary_status = 4;
 
@@ -127,42 +122,26 @@ class SummaryService
               $transaction->rollBack();
             }
           }
-
-
-          // print($item->title);
-          // print('<br>');
-          // print($item->decode_id);
-          // print('<br>');
-          // print('<br>');
         }
       } else {
         return true;
       }
-      sleep(10);
+
+      if ($i > 0) {
+        sleep(10);
+      }
     }
-    // foreach ($summary as $item) {
-    //   print($item->title);
-    //   print('<br>');
-    //   print($item->decode_id);
-    //   print('<br>');
-    //   print('<br>');
-    // }
-
-    // print_r($summary);
-    // exit;
-
-    // for ($i = 0; $i < 3; $i++) {
-
-
-
-
-    //   sleep(10);
-    // }
   }
 
-
-  public function decodeAudio($yandexStorageFile)
+  public function decodeAudio($yandexStorageFile, $extension, $account)
   {
+
+    $extensionsMap = [
+      'pcm' => 'LINEAR16_PCM',
+      'ogg' => 'OGG_OPUS',
+      'mp3' => 'MP3',
+    ];
+
     $url = "https://transcribe.api.cloud.yandex.net";
 
     $client = new Client([
@@ -171,7 +150,7 @@ class SummaryService
 
     $response = $client->request('POST', '/speech/stt/v2/longRunningRecognize', [
       'headers' => [
-        'Authorization' => 'Api-Key AQVNxpT5cvi9T36mk3HbRFMYVMl-HgfwlEHDuZnT'
+        'Authorization' => 'Api-Key ' . $account->api_secret_key
       ],
       'json' => [
         'config' => [
@@ -179,9 +158,10 @@ class SummaryService
             'languageCode' => 'ru-RU',
             'model' => 'general',
             // 'profanityFilter' => true,
-            'audioEncoding' => 'MP3',
+            'audioEncoding' => $extensionsMap[$extension],
             // 'sampleRateHertz' => '48000',
-            // 'audioChannelCount' => '1'
+            // 'audioChannelCount' => '1',
+            'literature_text' => true,
           ]
         ],
         'audio' => [
@@ -195,15 +175,8 @@ class SummaryService
     return $arr_body->id;
   }
 
-
-  public function uploadYandexStorage($uploadPath, $fileName)
+  public function uploadYandexStorage($uploadPath, $fileName, $account)
   {
-    // Отпрвляем файл в Яндекс Object Storage
-    $user = Yii::$app->user->identity;
-    $account = Account::find()
-      ->where(['user_id' => $user->id])
-      ->one();
-
     $sharedConfig = [
       'credentials' => [
         'key' => $account->y_key_id,
@@ -216,7 +189,6 @@ class SummaryService
 
     $s3Client = new S3Client($sharedConfig);
 
-    // Use multipart upload
     $uploader = new MultipartUploader($s3Client, $uploadPath, [
       'bucket' => $account->bucket_name,
       'key' => $fileName,
@@ -233,12 +205,13 @@ class SummaryService
     return $account->bucket_name . '/' . $fileName;
   }
 
-
-  // Создание и редактирование элемента
-  public function editItem(ItemForm $itemFormModel)
+  public function createItem(ItemForm $itemFormModel)
   {
+    $account = Account::find()
+      ->where(['user_id' => Yii::$app->user->identity->id])
+      ->one();
 
-    $editSummaryItem = Summary::find()
+    $itemsCount = Summary::find()
       ->where(['created_user' => Yii::$app->user->identity->id])
       ->count();
 
@@ -248,13 +221,15 @@ class SummaryService
       $fileName = substr(md5(microtime() . rand(0, 9999)), 0, 8) . '.' . $itemFormModel->file->extension;
       $uploadPath = './upload' . '/' . $fileName;
       $itemFormModel->file->saveAs($uploadPath);
-      $newItem->file = $this->uploadYandexStorage($uploadPath, $fileName);
+      $newItem->file = $this->uploadYandexStorage($uploadPath, $fileName, $account);
 
-      $newItem->decode_id = $this->decodeAudio($newItem->file);
+      $newItem->decode_id = $this->decodeAudio($newItem->file, $itemFormModel->file->extension, $account);
       $newItem->summary_status = 1;
+    } else {
+      $newItem->summary_status = 2;
     }
 
-    $newItem->number = $editSummaryItem + 1;
+    $newItem->number = $itemsCount + 1;
     $newItem->title = $itemFormModel->title;
     $newItem->detail = $itemFormModel->detail;
     $newItem->summary = $itemFormModel->summary;
@@ -274,52 +249,116 @@ class SummaryService
     }
   }
 
-
-
-  // /**
-  //  * @param int $id
-  //  * 
-  //  * @return Summary|null
-  //  */
-  // public function getSummary(int $id): ?Summary
-  // {
-  //   return Summary::find()
-  //     ->joinWith('city', 'category')
-  //     ->where(['tasks.id' => $id])
-  //     ->one();
-  // }
-
-  // public function editItem(ItemForm $itemtFormModel)
-  // {
-  //   $editItem = Summary::find()
-  //     ->where(['id' => $itemtFormModel->id])
-  //     ->one();
-
-  //   $item = new ItemForm();
-  // }
-
-  public function getEditSummaryItem($data)
+  public function getDetailItem($data)
   {
-    $detailFormModel = new ItemForm();
+    // $detailFormModel = new ItemForm();
 
-    $editSummaryItem = Summary::find()
-      ->where(['id' => $data])
-      ->one();
+    // $editSummaryItem = Summary::find()
+    //   ->where(['id' => $data])
+    //   ->one();
 
-    $detailFormModel->title = $editSummaryItem->title;
-    $detailFormModel->detail = $editSummaryItem->detail;
+    $detailItems = Detail::find()
+      ->where(['summary_id' => $data])
+      ->all();
 
+    $detailItemsList = [];
 
-    // $detailFormModel->number = $editSummaryItem->number;
-    // $detailFormModel->summary_status = $editSummaryItem->summary_status;
-    // $detailFormModel->summary = $editSummaryItem->summary;
-    // $detailFormModel->created_user = $editSummaryItem->created_user;
-    // $detailFormModel->created_at = $editSummaryItem->created_at;
-    // $detailFormModel->updated_at = $editSummaryItem->updated_at;
+    foreach ($detailItems as $detailItem) {
+      $detailForm = new DetailForm;
 
-    return $detailFormModel;
+      $detailForm->summary_id = $detailItem->summary_id;
+      $detailForm->detail_text = $detailItem->detail_text;
+      // $detailForm->detail = $itemFormModel->detail;
+
+      $detailItemsList[] = $detailForm;
+    }
+
+    // $detail = new DetailForm;
+
+    // $detailFormModel->title = $editSummaryItem->title;
+    // $detailFormModel->detail = $editSummaryItem->detail;
+
+    return $detailItemsList;
   }
 
+  public function editAccount(AccountForm $accountFormModel)
+  {
+    $editAccount = Account::find()
+      ->where(['user_id' => Yii::$app->user->identity->id])
+      ->one();
+
+    if (!$editAccount) {
+      $editAccount = new Account;
+      $editAccount->user_id = Yii::$app->user->identity->id;
+    }
+
+    $editAccount->api_secret_key = $accountFormModel->api_secret_key;
+    $editAccount->y_key_id = $accountFormModel->y_key_id;
+    $editAccount->y_secret_key = $accountFormModel->y_secret_key;
+    $editAccount->bucket_name = $accountFormModel->bucket_name;
+
+    $transaction = Yii::$app->db->beginTransaction();
+    try {
+      $editAccount->save();
+      $transaction->commit();
+    } catch (\Exception $e) {
+      $transaction->rollBack();
+      throw $e;
+    } catch (\Throwable $e) {
+      $transaction->rollBack();
+    }
+  }
+
+  public function uploadFile()
+  {
+    $fileName = 'file';
+    $uploadPath = './upload';
+    if (isset($_FILES[$fileName])) {
+      $file = \yii\web\UploadedFile::getInstanceByName($fileName);
+
+      // $fileName = uniqid('file_') . '.' . $file->extension;
+      $fileName = substr(md5(microtime() . rand(0, 9999)), 0, 8) . '.' . $file->extension;
+      $uploadPath = $uploadPath . '/' . $fileName;
+
+      if ($file->saveAs($uploadPath)) {
+        //Now save file data to database
+        echo \yii\helpers\Json::encode($file);
+
+        // Отпрвляем файл в Яндекс Object Storage
+        $user = Yii::$app->user->identity;
+        $account = Account::find()
+          ->where(['user_id' => $user->id])
+          ->one();
+
+        $sharedConfig = [
+          'credentials' => [
+            'key' => $account->y_key_id,
+            'secret' => $account->y_secret_key,
+          ],
+          'version' => 'latest',
+          'endpoint' => 'https://storage.yandexcloud.net',
+          'region' => 'ru-central1',
+        ];
+
+        $s3Client = new S3Client($sharedConfig);
+
+        // Use multipart upload
+        $uploader = new MultipartUploader($s3Client, $uploadPath, [
+          'bucket' => $account->bucket_name,
+          'key' => $fileName,
+        ]);
+
+        try {
+          $result = $uploader->upload();
+          echo "Upload complete: {$result['ObjectURL']}\n";
+        } catch (MultipartUploadException $e) {
+          echo $e->getMessage() . "\n";
+        }
+      }
+    }
+
+    return false;
+  }
 
   public function DetailEdit(ItemForm $detailModel)
   {
@@ -376,82 +415,25 @@ class SummaryService
   //   return $pageEditFormModel;
   // }
 
-  public function editAccount(AccountForm $accountFormModel)
-  {
-    $editAccount = Account::find()
-      ->where(['user_id' => Yii::$app->user->identity->id])
-      ->one();
+  // /**
+  //  * @param int $id
+  //  * 
+  //  * @return Summary|null
+  //  */
+  // public function getSummary(int $id): ?Summary
+  // {
+  //   return Summary::find()
+  //     ->joinWith('city', 'category')
+  //     ->where(['tasks.id' => $id])
+  //     ->one();
+  // }
 
-    if (!$editAccount) {
-      $editAccount = new Account;
-      $editAccount->user_id = Yii::$app->user->identity->id;
-    }
+  // public function editItem(ItemForm $itemtFormModel)
+  // {
+  //   $editItem = Summary::find()
+  //     ->where(['id' => $itemtFormModel->id])
+  //     ->one();
 
-    $editAccount->y_key_id = $accountFormModel->y_key_id;
-    $editAccount->y_secret_key = $accountFormModel->y_secret_key;
-    $editAccount->bucket_name = $accountFormModel->bucket_name;
-
-    $transaction = Yii::$app->db->beginTransaction();
-    try {
-      $editAccount->save();
-      $transaction->commit();
-    } catch (\Exception $e) {
-      $transaction->rollBack();
-      throw $e;
-    } catch (\Throwable $e) {
-      $transaction->rollBack();
-    }
-  }
-
-  public function uploadFile()
-  {
-    $fileName = 'file';
-    $uploadPath = './upload';
-    if (isset($_FILES[$fileName])) {
-      $file = \yii\web\UploadedFile::getInstanceByName($fileName);
-
-      // $fileName = uniqid('file_') . '.' . $file->extension;
-      $fileName = substr(md5(microtime() . rand(0, 9999)), 0, 8) . '.' . $file->extension;
-      $uploadPath = $uploadPath . '/' . $fileName;
-      //Print file data
-      //print_r($file);
-      if ($file->saveAs($uploadPath)) {
-        //Now save file data to database
-        echo \yii\helpers\Json::encode($file);
-
-        // Отпрвляем файл в Яндекс Object Storage
-        $user = Yii::$app->user->identity;
-        $account = Account::find()
-          ->where(['user_id' => $user->id])
-          ->one();
-
-        $sharedConfig = [
-          'credentials' => [
-            'key' => $account->y_key_id,
-            'secret' => $account->y_secret_key,
-          ],
-          'version' => 'latest',
-          'endpoint' => 'https://storage.yandexcloud.net',
-          'region' => 'ru-central1',
-        ];
-
-        $s3Client = new S3Client($sharedConfig);
-
-        // Use multipart upload
-        $uploader = new MultipartUploader($s3Client, $uploadPath, [
-          'bucket' => $account->bucket_name,
-          'key' => $fileName,
-        ]);
-
-        try {
-          $result = $uploader->upload();
-          echo "Upload complete: {$result['ObjectURL']}\n";
-        } catch (MultipartUploadException $e) {
-          echo $e->getMessage() . "\n";
-        }
-      }
-    }
-
-    return false;
-  }
+  //   $item = new ItemForm();
+  // }
 }
