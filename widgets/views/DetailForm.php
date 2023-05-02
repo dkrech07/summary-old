@@ -13,9 +13,9 @@ use yii\widgets\ActiveForm;
         <h5 class="modal-title" id="modalLabel">Подробное описание</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
       </div>
+
       <?php $form = ActiveForm::begin(['id' => 'detail']); ?>
       <div class="modal-body">
-        <div class="tabs"></div>
         <div class="mb-3">
           <?= $form->field($formModel, 'title')->textInput(['autofocus' => true, 'placeholder' => "Краткая информация о записи диалога"]) ?>
         </div>
@@ -24,8 +24,11 @@ use yii\widgets\ActiveForm;
         </div>
       </div>
       <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+        <div class="tabs"></div>
+        <div class="controls">
+          <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+        </div>
       </div>
       <?php ActiveForm::end(); ?>
 

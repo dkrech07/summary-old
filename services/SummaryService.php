@@ -261,12 +261,17 @@ class SummaryService
       ->where(['summary_id' => $data])
       ->all();
 
+    $summaryItem = Summary::find()
+      ->where(['id' => $data])
+      ->one();
+
     $detailItemsList = [];
 
     foreach ($detailItems as $detailItem) {
       $detailForm = new DetailForm;
 
       $detailForm->summary_id = $detailItem->summary_id;
+      $detailForm->title = $summaryItem->title;
       $detailForm->detail_text = $detailItem->detail_text;
       // $detailForm->detail = $itemFormModel->detail;
 

@@ -10,6 +10,7 @@ use yii\base\Model;
  *
  * @property int $id
  * @property int $summary_id
+ * @property string $title
  * @property string|null $detail_text
  *
  * @property Summary $summary
@@ -18,6 +19,7 @@ class DetailForm extends Model
 {
 
   public $summary_id;
+  public $title;
   public $detail_text;
 
   /**
@@ -36,7 +38,7 @@ class DetailForm extends Model
     return [
       [['summary_id'], 'required'],
       [['summary_id'], 'integer'],
-      [['detail_text'], 'string'],
+      [['title', 'detail_text'], 'string'],
       [['summary_id'], 'exist', 'skipOnError' => true, 'targetClass' => Summary::class, 'targetAttribute' => ['summary_id' => 'id']],
     ];
   }
@@ -50,6 +52,7 @@ class DetailForm extends Model
       // 'id' => 'ID',
       'summary_id' => 'Summary ID',
       'detail_text' => 'Detail Text',
+      'title' => 'Title',
     ];
   }
 

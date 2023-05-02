@@ -11,6 +11,7 @@ git clone git@github.com:dkrech07/summary.git
 3. Загрузить зависимости:
 
 composer install
+composer update
 
 4. Выполнить автозагрузку кастомных классов:
 

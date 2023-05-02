@@ -59,6 +59,18 @@
   color: #000; */
 }
 
+#detailModal .modal-footer {
+  justify-content: space-between;
+}
+
+.tabs .btn {
+  margin-left: 0.25rem;
+}
+
+.tabs .btn:first-child {
+  margin-left: 0px;
+}
+
 .loader .loader-img {
   position: absolute;
   top: 40%;

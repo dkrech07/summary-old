@@ -63,7 +63,7 @@ itemEditElement.forEach(element => {
     }
 
     $.ajax({
-      url: '/site/edit',
+      url: '/summary/web/site/edit',
       type: 'POST',
       data: data,
       success: function (response) {
@@ -74,24 +74,49 @@ itemEditElement.forEach(element => {
         var itemModalElement = document.querySelector('#' + editParam + 'Modal');
 
         var tabs = itemModalElement.querySelector('.tabs');
+
+        var tabsElements = tabs.querySelectorAll('.btn');
+        if (tabsElements) {
+          tabsElements.forEach(element => {
+            tabs.removeChild(element);
+          });
+        }
+
         itemData.forEach((element, index, array) => {
-          console.log(element);
           var tabElement = document.createElement("button");
-          tabElement.className = "btn btn-primary";
+          if (index < 1) {
+            tabElement.className = "btn btn-primary";
+          } else {
+            tabElement.className = "btn btn-secondary";
+          }
           tabElement.type = 'button';
           tabElement.textContent = 'Вариант ' + (index + 1);
+          tabElement.id = index;
           tabs.appendChild(tabElement);
+
+          var itemModalElementTitle = itemModalElement.querySelector('#itemform-' + 'title');
+          var itemModalElementInput = itemModalElement.querySelector('#itemform-' + editParam);
+          itemModalElementTitle.value = itemData[0]['title'];
+          itemModalElementInput.value = itemData[0][editParam + '_text'];
+
+          tabElement.addEventListener('click', evt => {
+            tabsElements.forEach(item => {
+              if (item.classList.contains('btn-primary')) {
+                item.classList.remove('btn-primary');
+              }
+              item.classList.add('btn-secondary');
+            });
+
+            itemModalElementTitle.value = itemData[index]['title'];
+            itemModalElementInput.value = itemData[index][editParam + '_text'];
+
+            tabElement.classList.remove('btn-secondary');
+            tabElement.classList.add('btn-primary');
+          });
         });
 
-        // <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">Open modal for @mdo</button>
+        var tabsElements = tabs.querySelectorAll('.btn');
 
-        console.log(tabs);
-
-        var itemModalElementInput = itemModalElement.querySelector('#itemform-' + editParam);
-        var itemModalElementTitle = itemModalElement.querySelector('#itemform-' + 'title');
-        console.log(itemModalElementInput);
-        itemModalElementInput.value = itemData[editParam];
-        itemModalElementTitle.value = itemData['title'];
         if (itemData) {
           $('#' + editParam + 'Modal').modal('show');
         }
