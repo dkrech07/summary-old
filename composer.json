@@ -70,6 +70,7 @@
         "yiisoft/yii2-bootstrap5": "^2.0",
         "aws/aws-sdk-php": "^3.263",
         "yiisoft/yii2-faker": "^2.0",
-        "guzzlehttp/guzzle": "^7.5"
+        "guzzlehttp/guzzle": "^7.5",
+        "orhanerday/open-ai": "^4.7"
     }
 }

@@ -9,11 +9,13 @@ use app\models\ItemForm;
 use app\models\Account;
 use app\models\Detail;
 use app\models\DetailForm;
+use app\models\SummaryForm;
 use yii\db\Expression;
 use Aws\S3\S3Client;
 use Aws\S3\MultipartUploader;
 use Aws\Exception\MultipartUploadException;
 use GuzzleHttp\Client;
+use Orhanerday\OpenAi\OpenAi;
 
 use Aws\Exception\AwsException;
 use yii\web\UploadedFile;
@@ -40,6 +42,57 @@ class SummaryService
     return Summary::find()
       ->orderBy('id DESC')
       ->joinWith('summaryStatus');
+  }
+
+  public function getSummary($data)
+  {
+    $open_ai_key = ''; //getenv('OPENAI_API_KEY');
+    $open_ai = new OpenAi($open_ai_key);
+
+    $chat = $open_ai->chat([
+      'model' => 'gpt-3.5-turbo',
+      'messages' => [
+        // [
+        //     "role" => "system",
+        //     "content" => "You are a helpful assistant."
+        // ],
+        [
+          "role" => "user",
+          "content" => "Сделай краткое описание из текста: " . $data,
+        ],
+        // [
+        //     "role" => "assistant",
+        //     "content" => "The Los Angeles Dodgers won the World Series in 2020."
+        // ],
+        // [
+        //     "role" => "user",
+        //     "content" => "Where was it played?"
+        // ],
+      ],
+      // 'temperature' => 1.0,
+      // 'max_tokens' => 4000,
+      // 'frequency_penalty' => 0,
+      // 'presence_penalty' => 0,
+    ]);
+
+    $d = json_decode($chat);
+
+    // // return $chat['choices'];
+    // var_dump($chat);
+    // print('<br>');
+    // print('<br>');
+    // var_dump($d->choices[0]->message->content);
+    // print('<br>');
+    // print('<br>');
+    // var_dump($chat);
+
+    // print('<br>');
+    // print('<br>');
+    // print($d['stdClass']);
+
+    // print($d['id']);
+    // exit;
+    return $d->choices[0]->message->content;
   }
 
   public function getDescription()
@@ -73,9 +126,13 @@ class SummaryService
             $arr_body = json_decode($body);
 
             if ($arr_body->done) {
+              $chunksList = $arr_body->response->chunks;
+
               $item->detail = $arr_body->response->chunks[0]->alternatives[0]->text;
               $item->updated_at = $this->getCurrentDate();
               $item->summary_status = 2;
+
+              $item->summary = $this->getSummary($chunksList[0]->alternatives[0]->text);
 
               $transaction = Yii::$app->db->beginTransaction();
               try {
@@ -88,7 +145,6 @@ class SummaryService
                 $transaction->rollBack();
               }
 
-              $chunksList = $arr_body->response->chunks;
               foreach ($chunksList as $chunkItem) {
                 $newDetail = new Detail;
 
@@ -105,6 +161,24 @@ class SummaryService
                 } catch (\Throwable $e) {
                   $transaction2->rollBack();
                 }
+
+                // if ($number === 0) {
+                //   getSummary($data)
+
+                //   $item->summary = getSummary($newDetail->detail_text);
+
+                //   $transaction = Yii::$app->db->beginTransaction();
+                //   try {
+                //     $item->save();
+                //     $transaction->commit();
+                //   } catch (\Exception $e) {
+                //     $transaction->rollBack();
+                //     throw $e;
+                //   } catch (\Throwable $e) {
+                //     $transaction->rollBack();
+                //   }
+
+                // }
               }
             }
           } else {
@@ -284,6 +358,21 @@ class SummaryService
     // $detailFormModel->detail = $editSummaryItem->detail;
 
     return $detailItemsList;
+  }
+
+  public function getSummmaryItem($data)
+  {
+    $summaryItem =  Summary::find()
+      ->where(['id' => $data])
+      ->one();
+
+    $summaryForm = new SummaryForm;
+
+    $summaryForm->summary_id = $summaryItem->id;
+    $summaryForm->title = $summaryItem->title;
+    $summaryForm->summary_text = $summaryItem->summary;
+
+    return $summaryForm;
   }
 
   public function editAccount(AccountForm $accountFormModel)

@@ -56,72 +56,141 @@ itemEditElement.forEach(element => {
       var data = {
         'item_id_detail': element.parentNode.id
       };
+
+      $.ajax({
+        url: '/summary/web/site/edit',
+        type: 'POST',
+        data: data,
+        success: function (response) {
+          var itemData = JSON.parse(response);
+          // var itemData = JSON.stringify(response);
+          // console.log(data);
+          // console.log(itemData);
+          var itemModalElement = document.querySelector('#' + editParam + 'Modal');
+
+          var tabs = itemModalElement.querySelector('.tabs');
+
+          var tabsElements = tabs.querySelectorAll('.btn');
+          if (tabsElements) {
+            tabsElements.forEach(element => {
+              tabs.removeChild(element);
+            });
+          }
+
+          itemData.forEach((element, index, array) => {
+            var tabElement = document.createElement("button");
+            if (index < 1) {
+              tabElement.className = "btn btn-primary";
+            } else {
+              tabElement.className = "btn btn-secondary";
+            }
+            tabElement.type = 'button';
+            tabElement.textContent = 'Вариант ' + (index + 1);
+            tabElement.id = index;
+            tabs.appendChild(tabElement);
+
+            var itemModalElementTitle = itemModalElement.querySelector('#itemform-' + 'title');
+            var itemModalElementInput = itemModalElement.querySelector('#itemform-' + editParam);
+            itemModalElementTitle.value = itemData[0]['title'];
+            itemModalElementInput.value = itemData[0][editParam + '_text'];
+
+            tabElement.addEventListener('click', evt => {
+              tabsElements.forEach(item => {
+                if (item.classList.contains('btn-primary')) {
+                  item.classList.remove('btn-primary');
+                }
+                item.classList.add('btn-secondary');
+              });
+
+              itemModalElementTitle.value = itemData[index]['title'];
+              itemModalElementInput.value = itemData[index][editParam + '_text'];
+
+              tabElement.classList.remove('btn-secondary');
+              tabElement.classList.add('btn-primary');
+            });
+          });
+
+          var tabsElements = tabs.querySelectorAll('.btn');
+
+          if (itemData) {
+            $('#' + editParam + 'Modal').modal('show');
+          }
+        }
+      });
+
     } else if (editParam === 'summary') {
       var data = {
         'item_id_summary': element.parentNode.id
       };
-    }
 
-    $.ajax({
-      url: '/summary/web/site/edit',
-      type: 'POST',
-      data: data,
-      success: function (response) {
-        var itemData = JSON.parse(response);
-        // var itemData = JSON.stringify(response);
-        // console.log(data);
-        // console.log(itemData);
-        var itemModalElement = document.querySelector('#' + editParam + 'Modal');
+      console.log(editParam);
 
-        var tabs = itemModalElement.querySelector('.tabs');
-
-        var tabsElements = tabs.querySelectorAll('.btn');
-        if (tabsElements) {
-          tabsElements.forEach(element => {
-            tabs.removeChild(element);
-          });
-        }
-
-        itemData.forEach((element, index, array) => {
-          var tabElement = document.createElement("button");
-          if (index < 1) {
-            tabElement.className = "btn btn-primary";
-          } else {
-            tabElement.className = "btn btn-secondary";
-          }
-          tabElement.type = 'button';
-          tabElement.textContent = 'Вариант ' + (index + 1);
-          tabElement.id = index;
-          tabs.appendChild(tabElement);
+      $.ajax({
+        url: '/summary/web/site/edit',
+        type: 'POST',
+        data: data,
+        success: function (response) {
+          var itemData = JSON.parse(response);
+          var itemModalElement = document.querySelector('#' + editParam + 'Modal');
 
           var itemModalElementTitle = itemModalElement.querySelector('#itemform-' + 'title');
           var itemModalElementInput = itemModalElement.querySelector('#itemform-' + editParam);
-          itemModalElementTitle.value = itemData[0]['title'];
-          itemModalElementInput.value = itemData[0][editParam + '_text'];
+          itemModalElementTitle.value = itemData['title'];
+          itemModalElementInput.value = itemData[editParam + '_text'];
 
-          tabElement.addEventListener('click', evt => {
-            tabsElements.forEach(item => {
-              if (item.classList.contains('btn-primary')) {
-                item.classList.remove('btn-primary');
-              }
-              item.classList.add('btn-secondary');
-            });
+          console.log(data);
+          console.log(itemData);
 
-            itemModalElementTitle.value = itemData[index]['title'];
-            itemModalElementInput.value = itemData[index][editParam + '_text'];
+          // var tabs = itemModalElement.querySelector('.tabs');
 
-            tabElement.classList.remove('btn-secondary');
-            tabElement.classList.add('btn-primary');
-          });
-        });
+          // var tabsElements = tabs.querySelectorAll('.btn');
+          // if (tabsElements) {
+          //   tabsElements.forEach(element => {
+          //     tabs.removeChild(element);
+          //   });
+          // }
 
-        var tabsElements = tabs.querySelectorAll('.btn');
+          // itemData.forEach((element, index, array) => {
+          //   var tabElement = document.createElement("button");
+          //   if (index < 1) {
+          //     tabElement.className = "btn btn-primary";
+          //   } else {
+          //     tabElement.className = "btn btn-secondary";
+          //   }
+          //   tabElement.type = 'button';
+          //   tabElement.textContent = 'Вариант ' + (index + 1);
+          //   tabElement.id = index;
+          //   tabs.appendChild(tabElement);
 
-        if (itemData) {
-          $('#' + editParam + 'Modal').modal('show');
+          //   var itemModalElementTitle = itemModalElement.querySelector('#itemform-' + 'title');
+          //   var itemModalElementInput = itemModalElement.querySelector('#itemform-' + editParam);
+          //   itemModalElementTitle.value = itemData[0]['title'];
+          //   itemModalElementInput.value = itemData[0][editParam + '_text'];
+
+          //   tabElement.addEventListener('click', evt => {
+          //     tabsElements.forEach(item => {
+          //       if (item.classList.contains('btn-primary')) {
+          //         item.classList.remove('btn-primary');
+          //       }
+          //       item.classList.add('btn-secondary');
+          //     });
+
+          //     itemModalElementTitle.value = itemData[index]['title'];
+          //     itemModalElementInput.value = itemData[index][editParam + '_text'];
+
+          //     tabElement.classList.remove('btn-secondary');
+          //     tabElement.classList.add('btn-primary');
+          //   });
+          // });
+
+          // var tabsElements = tabs.querySelectorAll('.btn');
+
+          if (itemData) {
+            $('#' + editParam + 'Modal').modal('show');
+          }
         }
-      }
-    });
+      });
+    }
 
   });
 });

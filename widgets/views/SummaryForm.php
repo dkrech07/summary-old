@@ -10,17 +10,25 @@ use yii\widgets\ActiveForm;
   <div class="modal-dialog modal-xl modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="modalLabel">Краткое описание</h5>
+        <h5 class="modal-title" id="modalLabel">Подробное описание</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
       </div>
-      <?php $form = ActiveForm::begin(['id' => 'summary']); ?>
 
+      <?php $form = ActiveForm::begin(['id' => 'detail']); ?>
       <div class="modal-body">
-        <?= $form->field($formModel, 'summary')->textarea(['autofocus' => true, 'rows' => '18'])->label(false) ?>
+        <div class="mb-3">
+          <?= $form->field($formModel, 'title')->textInput(['autofocus' => true, 'placeholder' => "Краткая информация о записи диалога"]) ?>
+        </div>
+        <div class="mb-3">
+          <?= $form->field($formModel, 'summary')->textarea(['rows' => '18', 'placeholder' => "Добавьте сюда текст"]) ?>
+        </div>
       </div>
       <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+        <div class="tabs"></div>
+        <div class="controls">
+          <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+        </div>
       </div>
       <?php ActiveForm::end(); ?>
 
